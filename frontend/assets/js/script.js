@@ -15,7 +15,9 @@ let currentPage = 1;
 const ITEMS_PER_PAGE = 10;
 let resumeText = '';
 let userFingerprint = '';
-let myWishlist = [];
+let myWishlist = []; // Saved in DB
+let draftWishlist = []; // Local draft, not yet saved
+let hasUnsavedChanges = false;
 
 // Init
 document.addEventListener('DOMContentLoaded', async () => {
@@ -475,13 +477,15 @@ async function analyzeResume() {
     `;
 
     try {
+        // Include saved dream universities for scoring
         const response = await fetch(`${API_URL}/analyze`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 resume_text: resumeText,
                 asta_cita: astaCita,
-                universities: JSON.stringify(filteredForAnalysis.slice(0, 50))
+                universities: JSON.stringify(filteredForAnalysis.slice(0, 50)),
+                dream_universities: myWishlist // Pass saved wishlist
             })
         });
 
@@ -594,10 +598,36 @@ function displayAnalysisResult(result) {
         
         html += '</div>';
     }
-    
+
+    // Dream University Scores (if user has saved wishlists)
+    if (result.dream_scores && result.dream_scores.length) {
+        html += `<div class="result-section dream-scores-section">
+            <h4><i class="fas fa-heart"></i> Skor Universitas Impianmu</h4>
+            <div class="dream-scores-list">`;
+        result.dream_scores.forEach(dream => {
+            const scoreColor = dream.score >= 80 ? '#10B981' : dream.score >= 60 ? '#F59E0B' : '#EF4444';
+            html += `
+                <div class="dream-score-card">
+                    <div class="dream-header">
+                        <h5>${dream.university}</h5>
+                        <span class="dream-score" style="background: ${scoreColor};">${dream.score}</span>
+                    </div>
+                    <div class="dream-program">${dream.program || ''}</div>
+                    <div class="dream-assessment">
+                        <strong>Penilaian:</strong> ${dream.assessment || ''}
+                    </div>
+                    ${dream.gap_analysis ? `<div class="dream-gap">
+                        <strong>Yang perlu ditingkatkan:</strong> ${dream.gap_analysis}
+                    </div>` : ''}
+                </div>
+            `;
+        });
+        html += '</div></div>';
+    }
+
     // Top 5 Recommendations
     if (result.top_5_recommendations && result.top_5_recommendations.length) {
-        html += `<div class="result-section"><h4><i class="fas fa-university"></i> Rekomendasi Universitas</h4><div class="recommendations-list">`;
+        html += `<div class="result-section"><h4><i class="fas fa-university"></i> Rekomendasi Sistem</h4><div class="recommendations-list">`;
         result.top_5_recommendations.forEach(rec => {
             const scoreColor = rec.score >= 80 ? '#10B981' : rec.score >= 60 ? '#F59E0B' : '#6B7280';
             html += `
@@ -653,6 +683,9 @@ async function loadMyWishlist() {
         if (res.ok) {
             const data = await res.json();
             myWishlist = data.wishlists || [];
+            // Initialize draft from saved (deep copy)
+            draftWishlist = myWishlist.map(w => ({...w}));
+            hasUnsavedChanges = false;
             updateWishlistUI();
         }
     } catch (e) {
@@ -660,102 +693,148 @@ async function loadMyWishlist() {
     }
 }
 
-// Check if university is in wishlist
+// Check if university is in draft wishlist
 function isInWishlist(uni) {
-    return myWishlist.some(w =>
+    return draftWishlist.some(w =>
         w.university_name === uni['Perguruan Tinggi'] &&
         w.program_name === uni['Program Studi']
     );
 }
 
-// Add to wishlist
-async function addToWishlist(uni) {
-    if (myWishlist.length >= 3) {
+// Add to draft wishlist (local only)
+function addToDraft(uni) {
+    if (draftWishlist.length >= 3) {
         alert('Maksimal 3 studi impian. Hapus salah satu untuk menambahkan yang baru.');
         return;
     }
 
-    try {
-        const res = await fetch(`${API_URL}/wishlist`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                user_fingerprint: userFingerprint,
-                university_name: uni['Perguruan Tinggi'] || '',
-                program_name: uni['Program Studi'] || '',
-                location: uni.Lokasi || '',
-                jenjang: uni['Jenjang Studi'] || '',
-                beasiswa: uni.Beasiswa || ''
-            })
-        });
+    // Check if already in draft
+    const exists = draftWishlist.some(w =>
+        w.university_name === uni['Perguruan Tinggi'] &&
+        w.program_name === uni['Program Studi']
+    );
+    if (exists) return;
 
-        const data = await res.json();
-        if (data.success) {
-            await loadMyWishlist();
-            displayResults(); // Refresh to update heart icons
-        } else {
-            alert(data.error || 'Gagal menambahkan ke wishlist');
-        }
-    } catch (e) {
-        console.error('Error adding to wishlist:', e);
-        alert('Gagal menambahkan ke wishlist');
-    }
+    // Add to draft with temporary ID
+    draftWishlist.push({
+        id: 'draft_' + Date.now(),
+        university_name: uni['Perguruan Tinggi'] || '',
+        program_name: uni['Program Studi'] || '',
+        location: uni.Lokasi || '',
+        jenjang: uni['Jenjang Studi'] || '',
+        beasiswa: uni.Beasiswa || '',
+        isNew: true // Mark as new (not in DB yet)
+    });
+
+    hasUnsavedChanges = true;
+    updateWishlistUI();
+    displayResults();
 }
 
-// Remove from wishlist
-async function removeFromWishlist(id) {
-    try {
-        const res = await fetch(`${API_URL}/wishlist?id=${id}&fingerprint=${userFingerprint}`, {
-            method: 'DELETE'
-        });
-
-        const data = await res.json();
-        if (data.success) {
-            await loadMyWishlist();
-            displayResults(); // Refresh to update heart icons
-        }
-    } catch (e) {
-        console.error('Error removing from wishlist:', e);
-    }
+// Remove from draft wishlist (local only)
+function removeFromDraft(id) {
+    draftWishlist = draftWishlist.filter(w => w.id !== id);
+    hasUnsavedChanges = true;
+    updateWishlistUI();
+    displayResults();
 }
 
-// Toggle wishlist
+// Toggle draft wishlist
 function toggleWishlist(uniIndex) {
     const uni = filteredUniversities[uniIndex];
     if (!uni) return;
 
-    const existing = myWishlist.find(w =>
+    const existing = draftWishlist.find(w =>
         w.university_name === uni['Perguruan Tinggi'] &&
         w.program_name === uni['Program Studi']
     );
 
     if (existing) {
-        removeFromWishlist(existing.id);
+        removeFromDraft(existing.id);
     } else {
-        addToWishlist(uni);
+        addToDraft(uni);
+    }
+}
+
+// Save draft to database
+async function saveWishlist() {
+    const saveBtn = document.getElementById('saveWishlistBtn');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+    }
+
+    try {
+        // Delete items that were removed
+        const toDelete = myWishlist.filter(saved =>
+            !draftWishlist.some(d => d.id === saved.id)
+        );
+        for (const item of toDelete) {
+            await fetch(`${API_URL}/wishlist?id=${item.id}&fingerprint=${userFingerprint}`, {
+                method: 'DELETE'
+            });
+        }
+
+        // Add new items
+        const toAdd = draftWishlist.filter(d => d.isNew);
+        for (const item of toAdd) {
+            await fetch(`${API_URL}/wishlist`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_fingerprint: userFingerprint,
+                    university_name: item.university_name,
+                    program_name: item.program_name,
+                    location: item.location,
+                    jenjang: item.jenjang,
+                    beasiswa: item.beasiswa
+                })
+            });
+        }
+
+        // Reload from DB to get proper IDs
+        await loadMyWishlist();
+        alert('Studi impian berhasil disimpan!');
+        loadInsights(); // Refresh insights
+    } catch (e) {
+        console.error('Error saving wishlist:', e);
+        alert('Gagal menyimpan. Coba lagi.');
+    } finally {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fas fa-save"></i> Simpan Impian';
+        }
     }
 }
 
 // Update wishlist UI
 function updateWishlistUI() {
     const container = document.getElementById('myWishlist');
+    const saveBtn = document.getElementById('saveWishlistBtn');
     if (!container) return;
 
-    if (myWishlist.length === 0) {
+    // Show/hide save button based on changes
+    if (saveBtn) {
+        saveBtn.style.display = hasUnsavedChanges ? 'inline-flex' : 'none';
+    }
+
+    if (draftWishlist.length === 0) {
         container.innerHTML = `
             <div class="wishlist-empty">
                 <i class="fas fa-heart"></i>
                 <p>Belum ada studi impian</p>
+                <p class="wishlist-hint">Klik ❤️ pada universitas untuk menambahkan</p>
             </div>
         `;
         return;
     }
 
-    container.innerHTML = myWishlist.map(w => `
-        <div class="wishlist-card">
-            <button class="wishlist-remove" onclick="removeFromWishlist('${w.id}')">
+    container.innerHTML = draftWishlist.map(w => `
+        <div class="wishlist-card ${w.isNew ? 'wishlist-card-new' : ''}">
+            <button class="wishlist-remove" onclick="removeFromDraft('${w.id}')">
                 <i class="fas fa-times"></i>
             </button>
+            ${w.isNew ? '<span class="wishlist-new-badge">Baru</span>' : ''}
             <h4>${w.university_name}</h4>
             <p class="wishlist-program">${w.program_name}</p>
             <div class="wishlist-meta">
@@ -800,6 +879,9 @@ function renderInsights() {
 
     // Render top universities list
     renderTopUniversities();
+
+    // Render word cloud
+    renderWordCloud();
 }
 
 function renderLocationChart() {
@@ -892,11 +974,39 @@ function renderTopUniversities() {
     `).join('');
 }
 
+function renderWordCloud() {
+    const container = document.getElementById('programWordCloud');
+    if (!container || !insightsData.program_keywords) return;
+
+    if (insightsData.program_keywords.length === 0) {
+        container.innerHTML = '<p class="no-data">Belum ada data</p>';
+        return;
+    }
+
+    // Get max count for scaling
+    const maxCount = Math.max(...insightsData.program_keywords.map(k => k.count));
+    const minSize = 12;
+    const maxSize = 36;
+
+    // Color palette
+    const colors = ['#6366F1', '#0D9488', '#F59E0B', '#EC4899', '#10B981', '#3B82F6', '#8B5CF6', '#EF4444'];
+
+    container.innerHTML = insightsData.program_keywords.map((keyword, i) => {
+        // Scale font size based on count
+        const size = minSize + ((keyword.count / maxCount) * (maxSize - minSize));
+        const color = colors[i % colors.length];
+        const opacity = 0.7 + (keyword.count / maxCount) * 0.3;
+
+        return `<span class="word-cloud-item" style="font-size: ${size}px; color: ${color}; opacity: ${opacity};" title="${keyword.count} kali">${keyword.word}</span>`;
+    }).join('');
+}
+
 // Expose to global
 window.performSearch = performSearch;
 window.goToPage = goToPage;
 window.analyzeResume = analyzeResume;
 window.scrollToAnalyzer = scrollToAnalyzer;
 window.toggleWishlist = toggleWishlist;
-window.removeFromWishlist = removeFromWishlist;
+window.removeFromDraft = removeFromDraft;
+window.saveWishlist = saveWishlist;
 window.loadInsights = loadInsights;

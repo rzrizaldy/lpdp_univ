@@ -254,14 +254,19 @@
 
             <!-- Wishlist Section -->
             <div class="wishlist-section">
-                <h3><i class="fas fa-heart"></i> Studi Impianmu <span class="wishlist-count">(max 3)</span></h3>
+                <div class="wishlist-header">
+                    <h3><i class="fas fa-heart"></i> Studi Impianmu <span class="wishlist-count">(max 3)</span></h3>
+                    <button id="saveWishlistBtn" class="save-wishlist-btn" onclick="saveWishlist()" style="display: none;">
+                        <i class="fas fa-save"></i> Simpan Impian
+                    </button>
+                </div>
                 <div id="myWishlist" class="wishlist-cards">
                     <div class="wishlist-empty">
                         <i class="fas fa-heart"></i>
                         <p>Belum ada studi impian</p>
                     </div>
                 </div>
-                <p class="wishlist-hint">Cari universitas di atas dan klik <i class="fas fa-heart"></i> untuk menyimpan</p>
+                <p class="wishlist-hint">Cari universitas di atas dan klik <i class="fas fa-heart"></i> untuk menyimpan, lalu tekan "Simpan Impian"</p>
             </div>
 
             <div class="analyzer-grid">
@@ -331,6 +336,12 @@
                 <div class="insight-card">
                     <h4><i class="fas fa-award"></i> Distribusi Beasiswa</h4>
                     <canvas id="beasiswaChart"></canvas>
+                </div>
+                <div class="insight-card insight-card-wide">
+                    <h4><i class="fas fa-tags"></i> Bidang Studi Populer</h4>
+                    <div id="programWordCloud" class="word-cloud">
+                        <p class="no-data">Belum ada data</p>
+                    </div>
                 </div>
             </div>
         </div>

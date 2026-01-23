@@ -51,11 +51,16 @@ RESPONS dalam Bahasa Indonesia, format JSON:
     "asta_cita_alignment": "Penilaian JUJUR keselarasan dengan Asta Cita - apakah cukup spesifik atau masih terlalu umum?",
     "strengths": ["Kekuatan nyata 1", "Kekuatan nyata 2"],
     "areas_to_improve": ["Kelemahan 1 + cara memperbaiki", "Kelemahan 2 + cara memperbaiki", "Kelemahan 3 + cara memperbaiki"],
+    "dream_scores": [
+        {"university": "Nama Univ Impian", "program": "Program", "score": 70, "assessment": "Penilaian jujur kecocokan kandidat dengan universitas ini", "gap_analysis": "Apa yang perlu diperbaiki untuk meningkatkan peluang"}
+    ],
     "top_5_recommendations": [
         {"rank": 1, "university": "Nama", "program": "Program", "location": "Negara", "score": 75, "reasoning": "Alasan spesifik mengapa cocok"}
     ],
     "advice": "Saran KONKRET dan ACTIONABLE untuk memperkuat aplikasi..."
-}"""
+}
+
+PENTING: Jika ada UNIVERSITAS IMPIAN yang diberikan, WAJIB sertakan "dream_scores" dengan penilaian untuk SETIAP universitas impian tersebut."""
 
 
 class handler(BaseHTTPRequestHandler):
@@ -124,10 +129,22 @@ class handler(BaseHTTPRequestHandler):
             resume_text = data.get('resume_text', '')
             asta_cita = data.get('asta_cita', '')
             universities = data.get('universities', '[]')
+            dream_universities = data.get('dream_universities', [])
 
             if not resume_text or len(resume_text.strip()) < 50:
                 self._send_error(400, 'Resume/CV terlalu pendek atau kosong')
                 return
+
+            # Build dream universities section
+            dream_section = ""
+            if dream_universities and len(dream_universities) > 0:
+                dream_list = "\n".join([f"- {d.get('university_name', '')} - {d.get('program_name', '')} ({d.get('location', '')})" for d in dream_universities])
+                dream_section = f"""
+
+UNIVERSITAS IMPIAN KANDIDAT (WAJIB nilai kecocokannya di dream_scores):
+{dream_list}
+
+Berikan penilaian JUJUR untuk setiap universitas impian di atas."""
 
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
@@ -141,13 +158,13 @@ ASPIRASI ASTA CITA:
 {asta_cita or 'Tidak disebutkan'}
 
 DAFTAR UNIVERSITAS (sudah difilter sesuai preferensi kandidat):
-{universities[:2000]}
+{universities[:2000]}{dream_section}
 
 Analisis dan rekomendasikan 5 universitas terbaik dari daftar di atas.
 """}
                 ],
                 temperature=0.5,
-                max_tokens=1500
+                max_tokens=1800
             )
 
             result_text = response.choices[0].message.content
@@ -283,13 +300,42 @@ Analisis dan rekomendasikan 5 universitas terbaik dari daftar di atas.
                 b = w.get('beasiswa', 'Unknown') or 'Unknown'
                 beasiswa_counts[b] = beasiswa_counts.get(b, 0) + 1
 
+            # Program study word cloud - extract meaningful keywords
+            stop_words = {
+                # Common degree prefixes/suffixes
+                'master', 'masters', 'ms', 'msc', 'm.sc', 'ma', 'm.a', 'mba', 'phd', 'ph.d',
+                'doctor', 'doctoral', 'bachelor', 'bachelors', 'bs', 'bsc', 'ba', 'b.a',
+                'magister', 'sarjana', 's1', 's2', 's3', 'degree', 'program', 'programme',
+                # Common filler words
+                'of', 'in', 'and', 'the', 'for', 'with', 'to', 'a', 'an', 'on', 'at',
+                'dan', 'untuk', 'dengan', 'atau', 'yang', 'di', 'ke',
+                # Generic terms
+                'science', 'sciences', 'study', 'studies', 'arts', 'applied', 'advanced',
+                'international', 'general', 'specialization', 'concentration', 'track'
+            }
+
+            word_counts = {}
+            for w in wishlists:
+                program = w.get('program_name', '') or ''
+                # Clean and split into words
+                words = program.lower().replace('-', ' ').replace('/', ' ').replace('(', ' ').replace(')', ' ').split()
+                for word in words:
+                    # Clean punctuation
+                    word = ''.join(c for c in word if c.isalnum())
+                    if word and len(word) > 2 and word not in stop_words:
+                        word_counts[word] = word_counts.get(word, 0) + 1
+
+            # Get top keywords
+            top_keywords = sorted(word_counts.items(), key=lambda x: x[1], reverse=True)[:30]
+
             self._send_json({
                 'total_wishlists': total_wishlists,
                 'total_users': unique_users,
                 'top_locations': [{'name': loc, 'count': cnt} for loc, cnt in top_locations],
                 'top_universities': [{'name': uni, 'count': cnt} for uni, cnt in top_universities],
                 'by_jenjang': jenjang_counts,
-                'by_beasiswa': beasiswa_counts
+                'by_beasiswa': beasiswa_counts,
+                'program_keywords': [{'word': w, 'count': c} for w, c in top_keywords]
             })
         except Exception as e:
             self._send_error(500, str(e))

@@ -961,6 +961,82 @@ body {
 
 .raw-response { white-space: pre-wrap; font-size: 13px; color: var(--text-secondary); }
 
+/* Dream Scores Section */
+.dream-scores-section {
+    background: linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%);
+    border-color: #F9A8D4;
+}
+
+.dream-scores-section h4 i { color: #EC4899; }
+
+.dream-scores-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dream-score-card {
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #F9A8D4;
+}
+
+.dream-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.dream-header h5 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.dream-score {
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 6px;
+}
+
+.dream-program {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.dream-assessment {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 8px;
+    padding: 10px;
+    background: #FDF2F8;
+    border-radius: 6px;
+}
+
+.dream-assessment strong {
+    color: var(--text-primary);
+}
+
+.dream-gap {
+    font-size: 12px;
+    color: #B45309;
+    line-height: 1.5;
+    padding: 10px;
+    background: #FEF3C7;
+    border-radius: 6px;
+}
+
+.dream-gap strong {
+    color: #92400E;
+}
+
 /* === Downloads Section === */
 .downloads-section {
     padding: 64px 0;
@@ -1130,6 +1206,64 @@ body {
 }
 
 .wishlist-hint i { color: #EF4444; }
+
+.wishlist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.wishlist-header h3 { margin-bottom: 0; }
+
+.save-wishlist-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.save-wishlist-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.save-wishlist-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.wishlist-card-new {
+    border: 2px solid #10B981;
+    background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
+}
+
+.wishlist-new-badge {
+    position: absolute;
+    top: -8px;
+    left: 12px;
+    background: #10B981;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.wishlist-empty .wishlist-hint {
+    font-size: 11px;
+    margin-top: 4px;
+}
 
 /* Wishlist button in table */
 .wishlist-btn {
@@ -1306,6 +1440,37 @@ body {
     color: var(--text-muted);
     font-size: 13px;
     padding: 20px;
+}
+
+/* Word Cloud */
+.insight-card-wide {
+    grid-column: 1 / -1;
+}
+
+.word-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 0;
+    min-height: 100px;
+}
+
+.word-cloud-item {
+    display: inline-block;
+    padding: 4px 8px;
+    font-weight: 600;
+    text-transform: capitalize;
+    cursor: default;
+    transition: transform 0.2s, opacity 0.2s;
+    border-radius: 4px;
+}
+
+.word-cloud-item:hover {
+    transform: scale(1.1);
+    opacity: 1 !important;
+    background: rgba(99, 102, 241, 0.1);
 }
 
 /* === Footer === */
