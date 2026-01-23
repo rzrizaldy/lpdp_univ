@@ -78,12 +78,43 @@ function setupEventListeners() {
         });
     }
 
-    // Filter tabs
-    document.querySelectorAll('.filter-tab').forEach(tab => {
+    // Filter tabs - Jenis
+    document.querySelectorAll('.filter-tab.filter-jenis').forEach(tab => {
         tab.addEventListener('click', () => {
-            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.filter-tab.filter-jenis').forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
             performSearch();
+        });
+    });
+
+    // Filter tabs - Jenjang
+    document.querySelectorAll('.filter-tab.filter-jenjang').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.filter-tab.filter-jenjang').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            performSearch();
+        });
+    });
+
+    // Filter dropdown - Lokasi
+    const lokasiFilter = document.getElementById('lokasiFilter');
+    if (lokasiFilter) {
+        lokasiFilter.addEventListener('change', () => performSearch());
+    }
+
+    // Analyzer filters - Jenis
+    document.querySelectorAll('.filter-tab.filter-jenis-analyzer').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.filter-tab.filter-jenis-analyzer').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+        });
+    });
+
+    // Analyzer filters - Jenjang
+    document.querySelectorAll('.filter-tab.filter-jenjang-analyzer').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.filter-tab.filter-jenjang-analyzer').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
         });
     });
 
@@ -126,11 +157,22 @@ function scrollToAnalyzer() {
 function performSearch() {
     const searchInput = document.getElementById('globalSearch');
     const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
-    const activeTab = document.querySelector('.filter-tab.active');
-    const filterType = activeTab ? activeTab.dataset.filter : 'all';
+
+    // Get Jenis filter
+    const activeJenisTab = document.querySelector('.filter-tab.filter-jenis.active');
+    const filterJenis = activeJenisTab ? activeJenisTab.dataset.filter : 'all';
+
+    // Get Jenjang filter
+    const activeJenjangTab = document.querySelector('.filter-tab.filter-jenjang.active');
+    const filterJenjang = activeJenjangTab ? activeJenjangTab.dataset.jenjang : 'all';
+
+    // Get Lokasi filter
+    const lokasiSelect = document.getElementById('lokasiFilter');
+    const filterLokasi = lokasiSelect ? lokasiSelect.value : 'all';
 
     let results = allUniversities;
-    
+
+    // Search term filter
     if (searchTerm) {
         results = results.filter(uni => {
             const text = `${uni['Perguruan Tinggi'] || ''} ${uni['Program Studi'] || ''} ${uni.Lokasi || ''} ${uni.Bidang || ''}`.toLowerCase();
@@ -138,8 +180,27 @@ function performSearch() {
         });
     }
 
-    if (filterType && filterType !== 'all') {
-        results = results.filter(uni => uni.Beasiswa === filterType);
+    // Jenis filter (Beasiswa type)
+    if (filterJenis && filterJenis !== 'all') {
+        results = results.filter(uni => uni.Beasiswa === filterJenis);
+    }
+
+    // Jenjang filter (Degree level)
+    if (filterJenjang && filterJenjang !== 'all') {
+        results = results.filter(uni => {
+            const jenjang = (uni['Jenjang Studi'] || '').toLowerCase();
+            if (filterJenjang === 'magister') {
+                return jenjang === 'magister' || jenjang === 'master';
+            } else if (filterJenjang === 'doktor') {
+                return jenjang === 'doktor';
+            }
+            return true;
+        });
+    }
+
+    // Lokasi filter
+    if (filterLokasi && filterLokasi !== 'all') {
+        results = results.filter(uni => uni.Lokasi === filterLokasi);
     }
 
     filteredUniversities = results;
@@ -327,17 +388,67 @@ function loadPdfJs() {
     });
 }
 
+// Get filtered universities for analyzer
+function getFilteredUniversitiesForAnalyzer() {
+    // Get Jenis filter
+    const activeJenisTab = document.querySelector('.filter-tab.filter-jenis-analyzer.active');
+    const filterJenis = activeJenisTab ? activeJenisTab.dataset.filter : 'all';
+
+    // Get Jenjang filter
+    const activeJenjangTab = document.querySelector('.filter-tab.filter-jenjang-analyzer.active');
+    const filterJenjang = activeJenjangTab ? activeJenjangTab.dataset.jenjang : 'all';
+
+    // Get Lokasi filter
+    const lokasiSelect = document.getElementById('lokasiFilterAnalyzer');
+    const filterLokasi = lokasiSelect ? lokasiSelect.value : 'all';
+
+    let results = allUniversities;
+
+    // Jenis filter (Beasiswa type)
+    if (filterJenis && filterJenis !== 'all') {
+        results = results.filter(uni => uni.Beasiswa === filterJenis);
+    }
+
+    // Jenjang filter (Degree level)
+    if (filterJenjang && filterJenjang !== 'all') {
+        results = results.filter(uni => {
+            const jenjang = (uni['Jenjang Studi'] || '').toLowerCase();
+            if (filterJenjang === 'magister') {
+                return jenjang === 'magister' || jenjang === 'master';
+            } else if (filterJenjang === 'doktor') {
+                return jenjang === 'doktor';
+            }
+            return true;
+        });
+    }
+
+    // Lokasi filter
+    if (filterLokasi && filterLokasi !== 'all') {
+        results = results.filter(uni => uni.Lokasi === filterLokasi);
+    }
+
+    return results;
+}
+
 // Resume Analysis
 async function analyzeResume() {
     const astaCita = document.getElementById('astaCita').value.trim();
     const resultDiv = document.getElementById('analysisResult');
     const analyzeBtn = document.getElementById('analyzeBtn');
-    
+
     if (!resumeText) {
         alert('Silakan unggah resume/CV terlebih dahulu');
         return;
     }
-    
+
+    // Get filtered universities based on analyzer filters
+    const filteredForAnalysis = getFilteredUniversitiesForAnalyzer();
+
+    if (filteredForAnalysis.length === 0) {
+        alert('Tidak ada universitas yang sesuai dengan filter. Silakan ubah filter.');
+        return;
+    }
+
     analyzeBtn.disabled = true;
     analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menganalisis...';
     resultDiv.style.display = 'block';
@@ -356,7 +467,7 @@ async function analyzeResume() {
             body: JSON.stringify({
                 resume_text: resumeText,
                 asta_cita: astaCita,
-                universities: JSON.stringify(allUniversities.slice(0, 100))
+                universities: JSON.stringify(filteredForAnalysis.slice(0, 100))
             })
         });
 

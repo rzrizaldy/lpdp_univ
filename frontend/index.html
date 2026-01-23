@@ -77,11 +77,77 @@
                     <i class="fas fa-file-alt"></i> Cari sesuai Resume/CV
                 </button>
             </div>
-            <div class="filter-section">
-                <button class="filter-tab active" data-filter="all">Semua Program</button>
-                <button class="filter-tab" data-filter="STEM Bidang STEM">STEM</button>
-                <button class="filter-tab" data-filter="SHARE">SHARE</button>
-                <button class="filter-tab" data-filter="STEM Bidang Pendukung STEM">Pendukung STEM</button>
+            <div class="filter-groups">
+                <!-- Jenis Program -->
+                <div class="filter-group">
+                    <span class="filter-label">Jenis</span>
+                    <div class="filter-buttons">
+                        <button class="filter-tab filter-jenis active" data-filter="all">Semua</button>
+                        <button class="filter-tab filter-jenis" data-filter="STEM Bidang STEM">STEM</button>
+                        <button class="filter-tab filter-jenis" data-filter="SHARE">SHARE</button>
+                        <button class="filter-tab filter-jenis" data-filter="STEM Bidang Pendukung STEM">Pendukung</button>
+                    </div>
+                </div>
+
+                <!-- Jenjang Studi -->
+                <div class="filter-group">
+                    <span class="filter-label">Jenjang</span>
+                    <div class="filter-buttons">
+                        <button class="filter-tab filter-jenjang active" data-jenjang="all">Semua</button>
+                        <button class="filter-tab filter-jenjang" data-jenjang="magister">Magister</button>
+                        <button class="filter-tab filter-jenjang" data-jenjang="doktor">Doktor</button>
+                    </div>
+                </div>
+
+                <!-- Lokasi -->
+                <div class="filter-group">
+                    <span class="filter-label">Lokasi</span>
+                    <select class="filter-select" id="lokasiFilter">
+                        <option value="all">Semua Lokasi</option>
+                        <optgroup label="Luar Negeri">
+                            <option value="Amerika Serikat">Amerika Serikat</option>
+                            <option value="Inggris">Inggris</option>
+                            <option value="Australia">Australia</option>
+                            <option value="Jepang">Jepang</option>
+                            <option value="Jerman">Jerman</option>
+                            <option value="Belanda">Belanda</option>
+                            <option value="Singapura">Singapura</option>
+                            <option value="Korea Selatan">Korea Selatan</option>
+                            <option value="Kanada">Kanada</option>
+                            <option value="Prancis">Prancis</option>
+                            <option value="Taiwan">Taiwan</option>
+                            <option value="Tiongkok">Tiongkok</option>
+                            <option value="Malaysia">Malaysia</option>
+                            <option value="Selandia Baru">Selandia Baru</option>
+                            <option value="Swiss">Swiss</option>
+                            <option value="Swedia">Swedia</option>
+                            <option value="Italia">Italia</option>
+                            <option value="Spanyol">Spanyol</option>
+                            <option value="Denmark">Denmark</option>
+                            <option value="Finlandia">Finlandia</option>
+                            <option value="Norwegia">Norwegia</option>
+                            <option value="Austria">Austria</option>
+                            <option value="Belgia">Belgia</option>
+                            <option value="Hong Kong">Hong Kong</option>
+                            <option value="India">India</option>
+                            <option value="Thailand">Thailand</option>
+                        </optgroup>
+                        <optgroup label="Dalam Negeri">
+                            <option value="DKI Jakarta">DKI Jakarta</option>
+                            <option value="Jawa Barat">Jawa Barat</option>
+                            <option value="Jawa Tengah">Jawa Tengah</option>
+                            <option value="Jawa Timur">Jawa Timur</option>
+                            <option value="DI Yogyakarta">DI Yogyakarta</option>
+                            <option value="Banten">Banten</option>
+                            <option value="Sumatera Utara">Sumatera Utara</option>
+                            <option value="Sumatera Barat">Sumatera Barat</option>
+                            <option value="Sumatera Selatan">Sumatera Selatan</option>
+                            <option value="Bali">Bali</option>
+                            <option value="Sulawesi Selatan">Sulawesi Selatan</option>
+                            <option value="Kalimantan Selatan">Kalimantan Selatan</option>
+                        </optgroup>
+                    </select>
+                </div>
             </div>
         </div>
     </section>
@@ -118,6 +184,67 @@
             <div class="analyzer-header">
                 <h2>Analisis Profil</h2>
                 <p>Cek kecocokan latar belakangmu dengan kriteria beasiswa LPDP</p>
+            </div>
+
+            <!-- Filter untuk Analisis -->
+            <div class="analyzer-filters">
+                <p class="filter-hint">Filter rekomendasi universitas:</p>
+                <div class="filter-groups">
+                    <!-- Jenis Program -->
+                    <div class="filter-group">
+                        <span class="filter-label">Jenis</span>
+                        <div class="filter-buttons">
+                            <button class="filter-tab filter-jenis-analyzer active" data-filter="all">Semua</button>
+                            <button class="filter-tab filter-jenis-analyzer" data-filter="STEM Bidang STEM">STEM</button>
+                            <button class="filter-tab filter-jenis-analyzer" data-filter="SHARE">SHARE</button>
+                            <button class="filter-tab filter-jenis-analyzer" data-filter="STEM Bidang Pendukung STEM">Pendukung</button>
+                        </div>
+                    </div>
+
+                    <!-- Jenjang Studi -->
+                    <div class="filter-group">
+                        <span class="filter-label">Jenjang</span>
+                        <div class="filter-buttons">
+                            <button class="filter-tab filter-jenjang-analyzer active" data-jenjang="all">Semua</button>
+                            <button class="filter-tab filter-jenjang-analyzer" data-jenjang="magister">Magister</button>
+                            <button class="filter-tab filter-jenjang-analyzer" data-jenjang="doktor">Doktor</button>
+                        </div>
+                    </div>
+
+                    <!-- Lokasi -->
+                    <div class="filter-group">
+                        <span class="filter-label">Lokasi</span>
+                        <select class="filter-select" id="lokasiFilterAnalyzer">
+                            <option value="all">Semua Lokasi</option>
+                            <optgroup label="Luar Negeri">
+                                <option value="Amerika Serikat">Amerika Serikat</option>
+                                <option value="Inggris">Inggris</option>
+                                <option value="Australia">Australia</option>
+                                <option value="Jepang">Jepang</option>
+                                <option value="Jerman">Jerman</option>
+                                <option value="Belanda">Belanda</option>
+                                <option value="Singapura">Singapura</option>
+                                <option value="Korea Selatan">Korea Selatan</option>
+                                <option value="Kanada">Kanada</option>
+                                <option value="Prancis">Prancis</option>
+                                <option value="Taiwan">Taiwan</option>
+                                <option value="Tiongkok">Tiongkok</option>
+                                <option value="Malaysia">Malaysia</option>
+                                <option value="Selandia Baru">Selandia Baru</option>
+                                <option value="Swiss">Swiss</option>
+                                <option value="Swedia">Swedia</option>
+                            </optgroup>
+                            <optgroup label="Dalam Negeri">
+                                <option value="DKI Jakarta">DKI Jakarta</option>
+                                <option value="Jawa Barat">Jawa Barat</option>
+                                <option value="Jawa Tengah">Jawa Tengah</option>
+                                <option value="Jawa Timur">Jawa Timur</option>
+                                <option value="DI Yogyakarta">DI Yogyakarta</option>
+                                <option value="Bali">Bali</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <div class="analyzer-grid">

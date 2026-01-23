@@ -413,19 +413,41 @@ body {
 
 .resume-search-btn i { margin-right: 6px; }
 
-/* === Filter Tabs === */
-.filter-section {
+/* === Filter Groups === */
+.filter-groups {
     display: flex;
-    gap: 8px;
+    gap: 24px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 50px;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 6px;
     flex-wrap: wrap;
 }
 
 .filter-tab {
-    padding: 8px 16px;
+    padding: 7px 14px;
     background: transparent;
     border: 1px solid var(--border);
-    border-radius: 20px;
-    font-size: 13px;
+    border-radius: 18px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--text-secondary);
     cursor: pointer;
@@ -438,10 +460,80 @@ body {
     color: var(--text-primary);
 }
 
-.filter-tab.active {
+/* Jenis filter - Purple accent (default) */
+.filter-tab.filter-jenis.active {
     background: var(--accent);
     color: var(--white);
     border-color: var(--accent);
+}
+
+/* Jenjang filter - Teal accent */
+.filter-tab.filter-jenjang.active {
+    background: #0D9488;
+    color: var(--white);
+    border-color: #0D9488;
+}
+
+.filter-tab.filter-jenjang:hover {
+    border-color: #0D9488;
+    color: #0D9488;
+}
+
+/* Lokasi dropdown */
+.filter-select {
+    padding: 7px 32px 7px 12px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    min-width: 140px;
+}
+
+.filter-select:hover {
+    border-color: #F97316;
+    color: var(--text-primary);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #F97316;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.filter-select option {
+    padding: 8px;
+}
+
+.filter-select optgroup {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Analyzer filters - same styling */
+.filter-tab.filter-jenis-analyzer.active {
+    background: var(--accent);
+    color: var(--white);
+    border-color: var(--accent);
+}
+
+.filter-tab.filter-jenjang-analyzer.active {
+    background: #0D9488;
+    color: var(--white);
+    border-color: #0D9488;
+}
+
+.filter-tab.filter-jenjang-analyzer:hover {
+    border-color: #0D9488;
+    color: #0D9488;
 }
 
 /* === Results Section === */
@@ -582,6 +674,25 @@ body {
 .analyzer-header p {
     color: var(--text-secondary);
     font-size: 14px;
+}
+
+/* Analyzer Filters */
+.analyzer-filters {
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.analyzer-filters .filter-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.analyzer-filters .filter-groups {
+    gap: 16px;
 }
 
 .analyzer-grid {
@@ -1005,4 +1116,27 @@ body {
     .footer-content { flex-direction: column; gap: 24px; }
     .search-wrapper { flex-direction: column; }
     .resume-search-btn { width: 100%; }
+
+    .filter-groups {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .filter-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .filter-label {
+        min-width: auto;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+
+    .analyzer-filters .filter-groups {
+        gap: 12px;
+    }
 }
