@@ -243,55 +243,88 @@ function goToPage(page) {
     document.querySelector('.results-section').scrollIntoView({ behavior: 'smooth' });
 }
 
-// File handling - NOW USES BACKEND PDF PARSER
+// File handling - Client-side PDF parsing using pdf.js
 async function handleFileSelect() {
     const input = document.getElementById('resumeUpload');
     const fileInfo = document.getElementById('fileInfo');
-    const fileName = document.getElementById('fileName');
-    const dropZone = document.getElementById('dropZone');
     
     if (!input.files || !input.files[0]) return;
     
     const file = input.files[0];
+    const fileName = file.name.toLowerCase();
     
     // Show loading state
     fileInfo.style.display = 'block';
     fileInfo.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membaca file...';
     
-    // Use FormData to send file to backend
-    const formData = new FormData();
-    formData.append('file', file);
-    
     try {
-        const response = await fetch(`${API_URL}/parse-pdf`, {
-            method: 'POST',
-            body: formData
-        });
-        
-        const result = await response.json();
-        
-        if (result.error) {
-            fileInfo.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${result.error}`;
-            fileInfo.style.background = '#FEE2E2';
-            fileInfo.style.color = '#DC2626';
-            resumeText = '';
-            return;
+        if (fileName.endsWith('.txt')) {
+            // Handle TXT files
+            resumeText = await file.text();
+        } else if (fileName.endsWith('.pdf')) {
+            // Handle PDF files using pdf.js
+            resumeText = await extractTextFromPDF(file);
+        } else {
+            throw new Error('Format file tidak didukung. Gunakan PDF atau TXT.');
         }
         
-        resumeText = result.text;
+        if (!resumeText || resumeText.trim().length < 50) {
+            throw new Error('File kosong atau terlalu pendek');
+        }
+        
         fileInfo.innerHTML = `<i class="fas fa-check-circle"></i> ${file.name}`;
         fileInfo.style.background = 'linear-gradient(135deg, #DCFCE7, #BBF7D0)';
         fileInfo.style.color = '#16A34A';
         
-        console.log(`PDF parsed successfully: ${resumeText.length} characters`);
+        console.log(`File parsed successfully: ${resumeText.length} characters`);
         
     } catch (error) {
         console.error('Error parsing file:', error);
-        fileInfo.innerHTML = '<i class="fas fa-exclamation-circle"></i> Gagal membaca file';
+        fileInfo.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message || 'Gagal membaca file'}`;
         fileInfo.style.background = '#FEE2E2';
         fileInfo.style.color = '#DC2626';
         resumeText = '';
     }
+}
+
+// Extract text from PDF using pdf.js
+async function extractTextFromPDF(file) {
+    // Load pdf.js dynamically if not already loaded
+    if (!window.pdfjsLib) {
+        await loadPdfJs();
+    }
+    
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    
+    let fullText = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(' ');
+        fullText += pageText + '\n\n';
+    }
+    
+    return fullText.trim();
+}
+
+// Load pdf.js library dynamically
+function loadPdfJs() {
+    return new Promise((resolve, reject) => {
+        if (window.pdfjsLib) {
+            resolve();
+            return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+        script.onload = () => {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            resolve();
+        };
+        script.onerror = () => reject(new Error('Gagal memuat PDF reader'));
+        document.head.appendChild(script);
+    });
 }
 
 // Resume Analysis
