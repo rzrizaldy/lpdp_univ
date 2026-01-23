@@ -3,7 +3,10 @@
  * Full Bahasa Indonesia
  */
 
-const API_URL = 'http://localhost:8001/api';
+// Use relative URL for production, localhost for development
+const API_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:8001/api' 
+    : '/api';
 
 // State
 let allUniversities = [];

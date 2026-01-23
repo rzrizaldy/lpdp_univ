@@ -16,6 +16,8 @@ app = Flask(__name__)
 CORS(app)
 
 # Import blueprints
+import sys
+sys.path.insert(0, os.path.dirname(__file__))
 from search import search_bp
 from analyze_resume import analyze_bp
 
