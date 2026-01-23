@@ -13,35 +13,37 @@ client = None
 if os.getenv('OPENAI_API_KEY'):
     client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
-SYSTEM_PROMPT = """Kamu adalah konsultan ahli beasiswa LPDP. Analisis resume/CV kandidat dan aspirasi Asta Cita mereka secara mendalam.
+SYSTEM_PROMPT = """Kamu adalah konsultan senior beasiswa LPDP yang KRITIS dan JUJUR. Tugasmu menilai kandidat secara objektif - jangan terlalu mudah memberi skor tinggi.
 
-ANALISIS YANG HARUS DILAKUKAN:
-1. **Latar Belakang Pendidikan (S1/S2)**
-2. **Pengalaman Kerja**
-3. **Keahlian & Kompetensi**
-4. **Keselarasan Asta Cita** (8 prioritas: Ketahanan pangan, Kesehatan, Energi, Hilirisasi industri, Transformasi ekonomi/pendidikan/digital, Maritim & dirgantara)
-5. **Rekomendasi Universitas** (5 paling cocok dari daftar LPDP)
+STANDAR PENILAIAN (KETAT):
+- Skor 80-100: Luar biasa, pengalaman sangat relevan, track record terbukti, Asta Cita sangat jelas
+- Skor 60-79: Bagus tapi ada gap yang perlu diperbaiki
+- Skor 40-59: Cukup, masih banyak yang perlu ditingkatkan
+- Skor <40: Perlu persiapan lebih matang sebelum mendaftar
 
-BERIKAN RESPONS DALAM BAHASA INDONESIA dengan format JSON:
+KRITERIA PENILAIAN:
+1. **Pendidikan**: IPK, relevansi jurusan, prestasi akademik
+2. **Pengalaman Kerja**: Relevansi dengan bidang studi, dampak nyata, kepemimpinan
+3. **Keselarasan Asta Cita**: Harus SPESIFIK dan TERUKUR, bukan hanya retorika
+   - 8 Prioritas: Ketahanan pangan, Kesehatan, Energi, Hilirisasi industri, Transformasi ekonomi/pendidikan/digital, Maritim & dirgantara
+4. **Keunikan Profil**: Apa yang membedakan dari kandidat lain?
+
+BERIKAN KRITIK KONSTRUKTIF - jelaskan APA yang kurang dan BAGAIMANA memperbaikinya.
+Jangan hanya memuji, tapi motivasi dengan menunjukkan potensi perbaikan.
+
+RESPONS dalam Bahasa Indonesia, format JSON:
 {
-    "overall_score": 75,
-    "profile_summary": "Ringkasan profil kandidat...",
-    "education_analysis": "Analisis latar belakang pendidikan...",
-    "work_analysis": "Analisis pengalaman kerja...",
-    "asta_cita_alignment": "Penilaian keselarasan dengan Asta Cita...",
-    "strengths": ["Kekuatan 1", "Kekuatan 2", "Kekuatan 3"],
-    "areas_to_improve": ["Area 1", "Area 2"],
+    "overall_score": 65,
+    "profile_summary": "Ringkasan objektif profil kandidat...",
+    "education_analysis": "Analisis kritis latar belakang pendidikan...",
+    "work_analysis": "Analisis kritis pengalaman kerja...",
+    "asta_cita_alignment": "Penilaian JUJUR keselarasan dengan Asta Cita - apakah cukup spesifik atau masih terlalu umum?",
+    "strengths": ["Kekuatan nyata 1", "Kekuatan nyata 2"],
+    "areas_to_improve": ["Kelemahan 1 + cara memperbaiki", "Kelemahan 2 + cara memperbaiki", "Kelemahan 3 + cara memperbaiki"],
     "top_5_recommendations": [
-        {
-            "rank": 1,
-            "university": "Nama Universitas",
-            "program": "Nama Program", 
-            "location": "Negara",
-            "score": 85,
-            "reasoning": "Alasan mengapa cocok..."
-        }
+        {"rank": 1, "university": "Nama", "program": "Program", "location": "Negara", "score": 75, "reasoning": "Alasan spesifik mengapa cocok"}
     ],
-    "advice": "Saran utama untuk memperkuat aplikasi..."
+    "advice": "Saran KONKRET dan ACTIONABLE untuk memperkuat aplikasi..."
 }"""
 
 
@@ -96,24 +98,24 @@ class handler(BaseHTTPRequestHandler):
                 return
             
             response = client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": f"""
-RESUME/CV KANDIDAT:
-{resume_text[:6000]}
+RESUME KANDIDAT:
+{resume_text[:4000]}
 
 ASPIRASI ASTA CITA:
 {asta_cita or 'Tidak disebutkan'}
 
-DAFTAR UNIVERSITAS LPDP (sample):
-{universities[:3000]}
+DAFTAR UNIVERSITAS (sudah difilter sesuai preferensi kandidat):
+{universities[:2000]}
 
-Lakukan analisis mendalam dan berikan rekomendasi dalam Bahasa Indonesia.
+Analisis dan rekomendasikan 5 universitas terbaik dari daftar di atas.
 """}
                 ],
-                temperature=0.7,
-                max_tokens=2500
+                temperature=0.5,
+                max_tokens=1500
             )
             
             result_text = response.choices[0].message.content

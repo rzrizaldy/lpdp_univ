@@ -467,7 +467,7 @@ async function analyzeResume() {
             body: JSON.stringify({
                 resume_text: resumeText,
                 asta_cita: astaCita,
-                universities: JSON.stringify(filteredForAnalysis.slice(0, 100))
+                universities: JSON.stringify(filteredForAnalysis.slice(0, 50))
             })
         });
 
