@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LPDP CTRL+F - Control your Future</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                LPDP
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path>
+                </svg>
+            </div>
+            <div class="nav-links">
+                <a href="#search">Cari</a>
+                <a href="#analyzer">Analisis</a>
+                <a href="#downloads">Unduh</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <h1 class="hero-title">
+                <span class="title-lpdp">LPDP</span>
+                <span class="title-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <defs>
+                            <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#a78bfa"/>
+                                <stop offset="50%" style="stop-color:#818cf8"/>
+                                <stop offset="100%" style="stop-color:#6366f1"/>
+                            </linearGradient>
+                        </defs>
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                </span>
+                <span class="title-ctrlf">CTRL+F</span>
+            </h1>
+            <div class="hero-taglines">
+                <p class="hero-tagline">Control your Future</p>
+                <p class="hero-subtitle animate-line">Cari universitas impianmu</p>
+                <p class="hero-subtitle animate-line">Selaraskan tujuanmu</p>
+                <p class="hero-subtitle animate-line">Capai Asta Cita Indonesia</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Section -->
+    <section id="search" class="search-section">
+        <div class="search-container">
+            <div class="search-wrapper">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="globalSearch" placeholder="Cari universitas, program, atau negara...">
+                </div>
+                <span class="or-divider">ATAU</span>
+                <button class="resume-search-btn" onclick="scrollToAnalyzer()">
+                    <i class="fas fa-file-alt"></i> Cari sesuai Resume/CV
+                </button>
+            </div>
+            <div class="filter-section">
+                <button class="filter-tab active" data-filter="all">Semua Program</button>
+                <button class="filter-tab" data-filter="STEM Bidang STEM">STEM</button>
+                <button class="filter-tab" data-filter="SHARE">SHARE</button>
+                <button class="filter-tab" data-filter="STEM Bidang Pendukung STEM">Pendukung STEM</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section">
+        <div class="results-container">
+            <div class="results-header">
+                <span id="resultCount" class="results-count">Menampilkan 28.007 hasil</span>
+            </div>
+            
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Universitas</th>
+                            <th>Program Studi</th>
+                            <th>Jenis</th>
+                            <th>Jenjang</th>
+                            <th>Lokasi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+
+            <div id="paginationContainer" class="pagination"></div>
+        </div>
+    </section>
+
+    <!-- Resume Analyzer Section -->
+    <section id="analyzer" class="analyzer-section">
+        <div class="analyzer-container">
+            <div class="analyzer-header">
+                <h2>Analisis Profil</h2>
+                <p>Cek kecocokan latar belakangmu dengan kriteria beasiswa LPDP</p>
+            </div>
+
+            <div class="analyzer-grid">
+                <!-- Upload Resume -->
+                <div class="analyzer-card">
+                    <h3><i class="fas fa-file-upload"></i> Unggah Resume/CV</h3>
+                    <div class="upload-zone" id="dropZone" onclick="document.getElementById('resumeUpload').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Tarik file kesini atau klik untuk unggah</p>
+                        <p class="hint">Format PDF atau TXT, maks 5MB</p>
+                        <input type="file" id="resumeUpload" hidden accept=".pdf,.txt">
+                    </div>
+                    <div id="fileInfo" style="display: none;">
+                        <i class="fas fa-check-circle"></i> <span id="fileName"></span>
+                    </div>
+                </div>
+
+                <!-- Asta Cita Description -->
+                <div class="analyzer-card">
+                    <h3><i class="fas fa-star"></i> Asta Cita Indonesia</h3>
+                    <p class="card-desc">Deskripsikan citamu untuk Asta Cita Indonesia</p>
+                    <textarea id="astaCita" placeholder="Ceritakan bagaimana kamu akan berkontribusi untuk Indonesia setelah lulus. Contoh: Saya ingin mengembangkan teknologi pertanian untuk meningkatkan ketahanan pangan..."></textarea>
+                </div>
+            </div>
+
+            <button class="analyze-btn" id="analyzeBtn" onclick="analyzeResume()">
+                <i class="fas fa-magic"></i> Analisis Profilku
+            </button>
+
+            <div id="analysisResult" style="display: none;"></div>
+        </div>
+    </section>
+
+    <!-- Downloads Section -->
+    <section id="downloads" class="downloads-section">
+        <div class="downloads-container">
+            <div class="downloads-header">
+                <h2>Panduan Resmi</h2>
+                <p>Unduh panduan resmi beasiswa LPDP</p>
+            </div>
+            <div class="downloads-grid">
+                <a href="http://localhost:8001/download/LPDP STEM.pdf" class="download-card">
+                    <div class="download-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="download-info">
+                        <h3>Panduan LPDP STEM</h3>
+                        <p>Sains, Teknologi, Teknik, Matematika</p>
+                    </div>
+                    <i class="fas fa-download download-action"></i>
+                </a>
+                <a href="http://localhost:8001/download/LPDP SHARE.pdf" class="download-card">
+                    <div class="download-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="download-info">
+                        <h3>Panduan LPDP SHARE</h3>
+                        <p>Sosial, Humaniora, Seni, Agama, Pendidikan</p>
+                    </div>
+                    <i class="fas fa-download download-action"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-main">
+                    <div class="footer-brand">LPDP CTRL+F</div>
+                    <p class="footer-text">From awardee to calon awardee. Pro-bono dan tidak menerima mentorship berbayar. Copyright dokumen dari website resmi LPDP. Situs ini bertujuan untuk mempermudah pencarian universitas saja.</p>
+                </div>
+                <div class="footer-contact">
+                    <h4>Kontak</h4>
+                    <a href="mailto:rutomo@andrew.cmu.edu" class="contact-email">
+                        <span>🇮🇩</span> rutomo@andrew.cmu.edu
+                    </a>
+                    <p class="contact-name">Rizaldy Utomo</p>
+                    <p class="contact-title">LPDP Awardee, Carnegie Mellon University</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                © 2026 LPDP CTRL+F
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
