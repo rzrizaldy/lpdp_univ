@@ -14,13 +14,18 @@ let filteredUniversities = [];
 let currentPage = 1;
 const ITEMS_PER_PAGE = 10;
 let resumeText = '';
+let userFingerprint = '';
+let myWishlist = [];
 
 // Init
 document.addEventListener('DOMContentLoaded', async () => {
+    userFingerprint = getOrCreateFingerprint();
     await loadData();
+    await loadMyWishlist();
     setupEventListeners();
     displayResults();
     setupNavbarScroll();
+    loadInsights();
 });
 
 // Navbar scroll effect
@@ -225,15 +230,24 @@ function displayResults() {
     const end = start + ITEMS_PER_PAGE;
     const pageData = filteredUniversities.slice(start, end);
 
-    tbody.innerHTML = pageData.map(uni => `
-        <tr>
-            <td>${uni['Perguruan Tinggi'] || '-'}</td>
-            <td>${uni['Program Studi'] || '-'}</td>
-            <td><span class="badge ${getBadgeClass(uni.Beasiswa)}">${getTypeLabel(uni.Beasiswa)}</span></td>
-            <td>${uni['Jenjang Studi'] || '-'}</td>
-            <td>${uni.Lokasi || '-'}</td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = pageData.map((uni, idx) => {
+        const globalIdx = start + idx;
+        const inWishlist = isInWishlist(uni);
+        return `
+            <tr>
+                <td>${uni['Perguruan Tinggi'] || '-'}</td>
+                <td>${uni['Program Studi'] || '-'}</td>
+                <td><span class="badge ${getBadgeClass(uni.Beasiswa)}">${getTypeLabel(uni.Beasiswa)}</span></td>
+                <td>${uni['Jenjang Studi'] || '-'}</td>
+                <td>${uni.Lokasi || '-'}</td>
+                <td>
+                    <button class="wishlist-btn ${inWishlist ? 'active' : ''}" onclick="toggleWishlist(${globalIdx})" title="${inWishlist ? 'Hapus dari wishlist' : 'Tambah ke wishlist'}">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
 
     renderPagination();
 }
@@ -620,8 +634,269 @@ function displayAnalysisResult(result) {
     div.innerHTML = html || '<p>Tidak ada hasil analisis</p>';
 }
 
+// ============ WISHLIST FUNCTIONS ============
+
+// Generate or get user fingerprint
+function getOrCreateFingerprint() {
+    let fp = localStorage.getItem('lpdp_fingerprint');
+    if (!fp) {
+        fp = 'user_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+        localStorage.setItem('lpdp_fingerprint', fp);
+    }
+    return fp;
+}
+
+// Load user's wishlist from API
+async function loadMyWishlist() {
+    try {
+        const res = await fetch(`${API_URL}/wishlist?fingerprint=${userFingerprint}`);
+        if (res.ok) {
+            const data = await res.json();
+            myWishlist = data.wishlists || [];
+            updateWishlistUI();
+        }
+    } catch (e) {
+        console.error('Error loading wishlist:', e);
+    }
+}
+
+// Check if university is in wishlist
+function isInWishlist(uni) {
+    return myWishlist.some(w =>
+        w.university_name === uni['Perguruan Tinggi'] &&
+        w.program_name === uni['Program Studi']
+    );
+}
+
+// Add to wishlist
+async function addToWishlist(uni) {
+    if (myWishlist.length >= 3) {
+        alert('Maksimal 3 studi impian. Hapus salah satu untuk menambahkan yang baru.');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_URL}/wishlist`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_fingerprint: userFingerprint,
+                university_name: uni['Perguruan Tinggi'] || '',
+                program_name: uni['Program Studi'] || '',
+                location: uni.Lokasi || '',
+                jenjang: uni['Jenjang Studi'] || '',
+                beasiswa: uni.Beasiswa || ''
+            })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            await loadMyWishlist();
+            displayResults(); // Refresh to update heart icons
+        } else {
+            alert(data.error || 'Gagal menambahkan ke wishlist');
+        }
+    } catch (e) {
+        console.error('Error adding to wishlist:', e);
+        alert('Gagal menambahkan ke wishlist');
+    }
+}
+
+// Remove from wishlist
+async function removeFromWishlist(id) {
+    try {
+        const res = await fetch(`${API_URL}/wishlist?id=${id}&fingerprint=${userFingerprint}`, {
+            method: 'DELETE'
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            await loadMyWishlist();
+            displayResults(); // Refresh to update heart icons
+        }
+    } catch (e) {
+        console.error('Error removing from wishlist:', e);
+    }
+}
+
+// Toggle wishlist
+function toggleWishlist(uniIndex) {
+    const uni = filteredUniversities[uniIndex];
+    if (!uni) return;
+
+    const existing = myWishlist.find(w =>
+        w.university_name === uni['Perguruan Tinggi'] &&
+        w.program_name === uni['Program Studi']
+    );
+
+    if (existing) {
+        removeFromWishlist(existing.id);
+    } else {
+        addToWishlist(uni);
+    }
+}
+
+// Update wishlist UI
+function updateWishlistUI() {
+    const container = document.getElementById('myWishlist');
+    if (!container) return;
+
+    if (myWishlist.length === 0) {
+        container.innerHTML = `
+            <div class="wishlist-empty">
+                <i class="fas fa-heart"></i>
+                <p>Belum ada studi impian</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = myWishlist.map(w => `
+        <div class="wishlist-card">
+            <button class="wishlist-remove" onclick="removeFromWishlist('${w.id}')">
+                <i class="fas fa-times"></i>
+            </button>
+            <h4>${w.university_name}</h4>
+            <p class="wishlist-program">${w.program_name}</p>
+            <div class="wishlist-meta">
+                <span><i class="fas fa-map-marker-alt"></i> ${w.location}</span>
+                <span class="badge ${getBadgeClass(w.beasiswa)}">${getTypeLabel(w.beasiswa)}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ============ INSIGHTS FUNCTIONS ============
+
+let insightsData = null;
+
+async function loadInsights() {
+    try {
+        const res = await fetch(`${API_URL}/insights`);
+        if (res.ok) {
+            insightsData = await res.json();
+            renderInsights();
+        }
+    } catch (e) {
+        console.error('Error loading insights:', e);
+    }
+}
+
+function renderInsights() {
+    if (!insightsData) return;
+
+    // Update stats
+    const totalEl = document.getElementById('totalWishlists');
+    const usersEl = document.getElementById('totalUsers');
+    if (totalEl) totalEl.textContent = insightsData.total_wishlists.toLocaleString('id-ID');
+    if (usersEl) usersEl.textContent = insightsData.total_users.toLocaleString('id-ID');
+
+    // Render charts if Chart.js is loaded
+    if (window.Chart) {
+        renderLocationChart();
+        renderJenjangChart();
+        renderBeasiswaChart();
+    }
+
+    // Render top universities list
+    renderTopUniversities();
+}
+
+function renderLocationChart() {
+    const ctx = document.getElementById('locationChart');
+    if (!ctx || !insightsData.top_locations) return;
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: insightsData.top_locations.slice(0, 8).map(l => l.name),
+            datasets: [{
+                label: 'Jumlah',
+                data: insightsData.top_locations.slice(0, 8).map(l => l.count),
+                backgroundColor: '#6366F1',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true } }
+        }
+    });
+}
+
+function renderJenjangChart() {
+    const ctx = document.getElementById('jenjangChart');
+    if (!ctx || !insightsData.by_jenjang) return;
+
+    const labels = Object.keys(insightsData.by_jenjang);
+    const data = Object.values(insightsData.by_jenjang);
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: ['#6366F1', '#0D9488', '#F59E0B', '#EF4444']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+}
+
+function renderBeasiswaChart() {
+    const ctx = document.getElementById('beasiswaChart');
+    if (!ctx || !insightsData.by_beasiswa) return;
+
+    const labels = Object.keys(insightsData.by_beasiswa).map(b => getTypeLabel(b));
+    const data = Object.values(insightsData.by_beasiswa);
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#6B7280']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+}
+
+function renderTopUniversities() {
+    const container = document.getElementById('topUniversities');
+    if (!container || !insightsData.top_universities) return;
+
+    if (insightsData.top_universities.length === 0) {
+        container.innerHTML = '<p class="no-data">Belum ada data</p>';
+        return;
+    }
+
+    container.innerHTML = insightsData.top_universities.slice(0, 5).map((u, i) => `
+        <div class="ranking-item">
+            <span class="ranking-number">${i + 1}</span>
+            <div class="ranking-info">
+                <span class="ranking-name">${u.name}</span>
+                <span class="ranking-count">${u.count} impian</span>
+            </div>
+        </div>
+    `).join('');
+}
+
 // Expose to global
 window.performSearch = performSearch;
 window.goToPage = goToPage;
 window.analyzeResume = analyzeResume;
 window.scrollToAnalyzer = scrollToAnalyzer;
+window.toggleWishlist = toggleWishlist;
+window.removeFromWishlist = removeFromWishlist;
+window.loadInsights = loadInsights;

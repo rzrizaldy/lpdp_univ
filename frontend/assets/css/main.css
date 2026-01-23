@@ -1029,6 +1029,285 @@ body {
 .download-action { color: var(--text-muted); font-size: 14px; }
 .download-card:hover .download-action { color: var(--accent); }
 
+/* === Wishlist Section === */
+.wishlist-section {
+    margin-bottom: 24px;
+    padding: 20px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.wishlist-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wishlist-section h3 i { color: #EF4444; }
+.wishlist-count { font-weight: 400; color: var(--text-muted); font-size: 13px; }
+
+.wishlist-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.wishlist-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    position: relative;
+}
+
+.wishlist-card h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    padding-right: 24px;
+}
+
+.wishlist-program {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.wishlist-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.wishlist-meta i { margin-right: 2px; }
+
+.wishlist-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wishlist-remove:hover {
+    background: #FEE2E2;
+    color: #EF4444;
+}
+
+.wishlist-empty {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-muted);
+    grid-column: 1 / -1;
+}
+
+.wishlist-empty i {
+    font-size: 24px;
+    margin-bottom: 8px;
+    opacity: 0.3;
+}
+
+.wishlist-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.wishlist-hint i { color: #EF4444; }
+
+/* Wishlist button in table */
+.wishlist-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--border);
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.wishlist-btn:hover {
+    background: #FEE2E2;
+    color: #EF4444;
+}
+
+.wishlist-btn.active {
+    color: #EF4444;
+}
+
+.wishlist-btn.active:hover {
+    background: #FEE2E2;
+}
+
+/* === Asta Cita Bersama Section === */
+.bersama-section {
+    padding: 64px 0;
+    background: linear-gradient(180deg, var(--bg) 0%, var(--white) 100%);
+    border-top: 1px solid var(--border);
+}
+
+.bersama-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.bersama-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.bersama-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.bersama-header h2 i { color: var(--accent); }
+
+.bersama-header p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+.stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+}
+
+.stat-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 32px;
+    text-align: center;
+    min-width: 140px;
+}
+
+.stat-number {
+    display: block;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.insight-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+}
+
+.insight-card h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.insight-card h4 i {
+    color: var(--accent);
+    font-size: 14px;
+}
+
+.insight-card canvas {
+    max-height: 200px;
+}
+
+.ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ranking-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.ranking-item:last-child { border-bottom: none; }
+
+.ranking-number {
+    width: 24px;
+    height: 24px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.ranking-info { flex: 1; }
+
+.ranking-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.ranking-count {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.no-data {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 20px;
+}
+
 /* === Footer === */
 .footer {
     padding: 48px 0 24px;
@@ -1138,5 +1417,22 @@ body {
 
     .analyzer-filters .filter-groups {
         gap: 12px;
+    }
+
+    .stats-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 16px 24px;
+    }
+
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .wishlist-cards {
+        grid-template-columns: 1fr;
     }
 }
