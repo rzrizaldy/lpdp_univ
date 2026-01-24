@@ -865,7 +865,7 @@ function updateWishlistUI() {
 // ============ INSIGHTS FUNCTIONS ============
 
 let insightsData = null;
-let insightsFilters = { location: null, jenjang: null, beasiswa: null };
+let insightsFilters = { location: null, jenjang: null, beasiswa: null, university: null };
 let chartInstances = { location: null, jenjang: null, beasiswa: null };
 
 async function loadInsights(filters = {}) {
@@ -875,6 +875,7 @@ async function loadInsights(filters = {}) {
         if (filters.location) params.append('location', filters.location);
         if (filters.jenjang) params.append('jenjang', filters.jenjang);
         if (filters.beasiswa) params.append('beasiswa', filters.beasiswa);
+        if (filters.university) params.append('university', filters.university);
 
         const queryString = params.toString();
         const url = queryString ? `${API_URL}/insights?${queryString}` : `${API_URL}/insights`;
@@ -918,13 +919,14 @@ function updateFilterIndicator() {
     const indicator = document.getElementById('filterIndicator');
     if (!indicator) return;
 
-    const hasFilters = insightsFilters.location || insightsFilters.jenjang || insightsFilters.beasiswa;
+    const hasFilters = insightsFilters.location || insightsFilters.jenjang || insightsFilters.beasiswa || insightsFilters.university;
 
     if (hasFilters) {
         const parts = [];
         if (insightsFilters.location) parts.push(insightsFilters.location);
         if (insightsFilters.jenjang) parts.push(insightsFilters.jenjang);
         if (insightsFilters.beasiswa) parts.push(getTypeLabel(insightsFilters.beasiswa));
+        if (insightsFilters.university) parts.push(insightsFilters.university);
         indicator.innerHTML = `<span class="filter-active"><i class="fas fa-filter"></i> Filter aktif: ${parts.join(', ')} <button onclick="clearInsightsFilter()" class="clear-filter-btn"><i class="fas fa-times"></i></button></span>`;
         indicator.style.display = 'block';
     } else {
@@ -933,7 +935,7 @@ function updateFilterIndicator() {
 }
 
 function clearInsightsFilter() {
-    insightsFilters = { location: null, jenjang: null, beasiswa: null };
+    insightsFilters = { location: null, jenjang: null, beasiswa: null, university: null };
     loadInsights({});
 }
 
@@ -1074,7 +1076,7 @@ function renderTopUniversities() {
     }
 
     container.innerHTML = insightsData.top_universities.slice(0, 5).map((u, i) => `
-        <div class="ranking-item">
+        <div class="ranking-item ${insightsFilters.university === u.name ? 'ranking-item-active' : ''}" onclick="applyInsightsFilter('university', '${u.name.replace(/'/g, "\\'")}')">
             <span class="ranking-number">${i + 1}</span>
             <div class="ranking-info">
                 <span class="ranking-name">${u.name}</span>

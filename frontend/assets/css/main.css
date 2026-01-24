@@ -1457,8 +1457,30 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px 0;
+    padding: 8px 12px;
+    margin: 0 -12px;
     border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    border-radius: var(--radius);
+    transition: background 0.2s;
+}
+
+.ranking-item:hover {
+    background: var(--bg);
+}
+
+.ranking-item-active {
+    background: var(--accent);
+}
+
+.ranking-item-active .ranking-name,
+.ranking-item-active .ranking-count {
+    color: white;
+}
+
+.ranking-item-active .ranking-number {
+    background: white;
+    color: var(--accent);
 }
 
 .ranking-item:last-child { border-bottom: none; }

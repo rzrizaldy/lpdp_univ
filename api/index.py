@@ -269,6 +269,7 @@ Analisis dan rekomendasikan 5 universitas terbaik dari daftar di atas.
         filter_location = query.get('location', [None])[0] if query else None
         filter_jenjang = query.get('jenjang', [None])[0] if query else None
         filter_beasiswa = query.get('beasiswa', [None])[0] if query else None
+        filter_university = query.get('university', [None])[0] if query else None
 
         try:
             # Get all wishlists
@@ -282,6 +283,8 @@ Analisis dan rekomendasikan 5 universitas terbaik dari daftar di atas.
                 wishlists = [w for w in wishlists if w.get('jenjang') == filter_jenjang]
             if filter_beasiswa:
                 wishlists = [w for w in wishlists if w.get('beasiswa') == filter_beasiswa]
+            if filter_university:
+                wishlists = [w for w in wishlists if w.get('university_name') == filter_university]
 
             # Aggregate stats
             total_wishlists = len(wishlists)
@@ -352,7 +355,8 @@ Analisis dan rekomendasikan 5 universitas terbaik dari daftar di atas.
                 'active_filters': {
                     'location': filter_location,
                     'jenjang': filter_jenjang,
-                    'beasiswa': filter_beasiswa
+                    'beasiswa': filter_beasiswa,
+                    'university': filter_university
                 }
             })
         except Exception as e:
