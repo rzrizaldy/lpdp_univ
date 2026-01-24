@@ -1067,6 +1067,16 @@ body {
     font-size: 14px;
 }
 
+.downloads-header .last-update {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+.downloads-header .last-update i {
+    margin-right: 4px;
+}
+
 .downloads-grid { display: flex; flex-direction: column; gap: 12px; }
 
 .download-card {
@@ -1328,6 +1338,51 @@ body {
     color: var(--text-secondary);
     font-size: 14px;
     margin-bottom: 24px;
+}
+
+.chart-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.chart-hint i {
+    margin-right: 4px;
+    color: var(--accent);
+}
+
+.filter-indicator {
+    margin-bottom: 16px;
+}
+
+.filter-active {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.clear-filter-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.clear-filter-btn:hover {
+    background: rgba(255,255,255,0.4);
 }
 
 .stats-row {

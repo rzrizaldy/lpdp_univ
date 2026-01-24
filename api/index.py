@@ -77,7 +77,7 @@ class handler(BaseHTTPRequestHandler):
         if path == '/api/wishlist':
             self._handle_get_wishlist(query)
         elif path == '/api/insights':
-            self._handle_get_insights()
+            self._handle_get_insights(query)
         else:
             # Default health check
             self._send_json({
@@ -260,15 +260,28 @@ Analisis dan rekomendasikan 5 universitas terbaik dari daftar di atas.
             self._send_error(500, str(e))
 
     # ============ INSIGHTS ENDPOINT ============
-    def _handle_get_insights(self):
+    def _handle_get_insights(self, query=None):
         if not supabase:
             self._send_error(500, 'Database tidak dikonfigurasi')
             return
+
+        # Get filter parameters
+        filter_location = query.get('location', [None])[0] if query else None
+        filter_jenjang = query.get('jenjang', [None])[0] if query else None
+        filter_beasiswa = query.get('beasiswa', [None])[0] if query else None
 
         try:
             # Get all wishlists
             all_data = supabase.table('wishlists').select('*').execute()
             wishlists = all_data.data
+
+            # Apply filters
+            if filter_location:
+                wishlists = [w for w in wishlists if w.get('location') == filter_location]
+            if filter_jenjang:
+                wishlists = [w for w in wishlists if w.get('jenjang') == filter_jenjang]
+            if filter_beasiswa:
+                wishlists = [w for w in wishlists if w.get('beasiswa') == filter_beasiswa]
 
             # Aggregate stats
             total_wishlists = len(wishlists)
@@ -335,7 +348,12 @@ Analisis dan rekomendasikan 5 universitas terbaik dari daftar di atas.
                 'top_universities': [{'name': uni, 'count': cnt} for uni, cnt in top_universities],
                 'by_jenjang': jenjang_counts,
                 'by_beasiswa': beasiswa_counts,
-                'program_keywords': [{'word': w, 'count': c} for w, c in top_keywords]
+                'program_keywords': [{'word': w, 'count': c} for w, c in top_keywords],
+                'active_filters': {
+                    'location': filter_location,
+                    'jenjang': filter_jenjang,
+                    'beasiswa': filter_beasiswa
+                }
             })
         except Exception as e:
             self._send_error(500, str(e))

@@ -28,7 +28,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     displayResults();
     setupNavbarScroll();
     loadInsights();
+    loadDownloadsConfig();
 });
+
+// Load downloads last update
+async function loadDownloadsConfig() {
+    try {
+        const res = await fetch('/assets/config/downloads.json');
+        if (res.ok) {
+            const config = await res.json();
+            const el = document.getElementById('downloadsLastUpdate');
+            if (el && config.lastUpdateDisplay) {
+                el.textContent = config.lastUpdateDisplay;
+            }
+        }
+    } catch (e) {
+        console.error('Error loading downloads config:', e);
+    }
+}
 
 // Navbar scroll effect
 function setupNavbarScroll() {
@@ -848,13 +865,26 @@ function updateWishlistUI() {
 // ============ INSIGHTS FUNCTIONS ============
 
 let insightsData = null;
+let insightsFilters = { location: null, jenjang: null, beasiswa: null };
+let chartInstances = { location: null, jenjang: null, beasiswa: null };
 
-async function loadInsights() {
+async function loadInsights(filters = {}) {
     try {
-        const res = await fetch(`${API_URL}/insights`);
+        // Build query string with filters
+        const params = new URLSearchParams();
+        if (filters.location) params.append('location', filters.location);
+        if (filters.jenjang) params.append('jenjang', filters.jenjang);
+        if (filters.beasiswa) params.append('beasiswa', filters.beasiswa);
+
+        const queryString = params.toString();
+        const url = queryString ? `${API_URL}/insights?${queryString}` : `${API_URL}/insights`;
+
+        const res = await fetch(url);
         if (res.ok) {
             insightsData = await res.json();
+            insightsFilters = filters;
             renderInsights();
+            updateFilterIndicator();
         }
     } catch (e) {
         console.error('Error loading insights:', e);
@@ -884,18 +914,60 @@ function renderInsights() {
     renderWordCloud();
 }
 
+function updateFilterIndicator() {
+    const indicator = document.getElementById('filterIndicator');
+    if (!indicator) return;
+
+    const hasFilters = insightsFilters.location || insightsFilters.jenjang || insightsFilters.beasiswa;
+
+    if (hasFilters) {
+        const parts = [];
+        if (insightsFilters.location) parts.push(insightsFilters.location);
+        if (insightsFilters.jenjang) parts.push(insightsFilters.jenjang);
+        if (insightsFilters.beasiswa) parts.push(getTypeLabel(insightsFilters.beasiswa));
+        indicator.innerHTML = `<span class="filter-active"><i class="fas fa-filter"></i> Filter aktif: ${parts.join(', ')} <button onclick="clearInsightsFilter()" class="clear-filter-btn"><i class="fas fa-times"></i></button></span>`;
+        indicator.style.display = 'block';
+    } else {
+        indicator.style.display = 'none';
+    }
+}
+
+function clearInsightsFilter() {
+    insightsFilters = { location: null, jenjang: null, beasiswa: null };
+    loadInsights({});
+}
+
+function applyInsightsFilter(type, value) {
+    // Toggle filter - if same value clicked, clear it
+    if (insightsFilters[type] === value) {
+        insightsFilters[type] = null;
+    } else {
+        insightsFilters[type] = value;
+    }
+    loadInsights(insightsFilters);
+}
+
 function renderLocationChart() {
     const ctx = document.getElementById('locationChart');
     if (!ctx || !insightsData.top_locations) return;
 
-    new Chart(ctx, {
+    // Destroy existing chart
+    if (chartInstances.location) {
+        chartInstances.location.destroy();
+    }
+
+    const locations = insightsData.top_locations.slice(0, 8);
+
+    chartInstances.location = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: insightsData.top_locations.slice(0, 8).map(l => l.name),
+            labels: locations.map(l => l.name),
             datasets: [{
                 label: 'Jumlah',
-                data: insightsData.top_locations.slice(0, 8).map(l => l.count),
-                backgroundColor: '#6366F1',
+                data: locations.map(l => l.count),
+                backgroundColor: locations.map(l =>
+                    insightsFilters.location === l.name ? '#4F46E5' : '#6366F1'
+                ),
                 borderRadius: 4
             }]
         },
@@ -903,7 +975,14 @@ function renderLocationChart() {
             indexAxis: 'y',
             responsive: true,
             plugins: { legend: { display: false } },
-            scales: { x: { beginAtZero: true } }
+            scales: { x: { beginAtZero: true } },
+            onClick: (event, elements) => {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    const location = locations[index].name;
+                    applyInsightsFilter('location', location);
+                }
+            }
         }
     });
 }
@@ -912,21 +991,36 @@ function renderJenjangChart() {
     const ctx = document.getElementById('jenjangChart');
     if (!ctx || !insightsData.by_jenjang) return;
 
+    // Destroy existing chart
+    if (chartInstances.jenjang) {
+        chartInstances.jenjang.destroy();
+    }
+
     const labels = Object.keys(insightsData.by_jenjang);
     const data = Object.values(insightsData.by_jenjang);
+    const baseColors = ['#6366F1', '#0D9488', '#F59E0B', '#EF4444'];
 
-    new Chart(ctx, {
+    chartInstances.jenjang = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: labels,
             datasets: [{
                 data: data,
-                backgroundColor: ['#6366F1', '#0D9488', '#F59E0B', '#EF4444']
+                backgroundColor: baseColors,
+                borderWidth: labels.map((l, i) => insightsFilters.jenjang === l ? 4 : 1),
+                borderColor: labels.map((l, i) => insightsFilters.jenjang === l ? '#1F2937' : '#fff')
             }]
         },
         options: {
             responsive: true,
-            plugins: { legend: { position: 'bottom' } }
+            plugins: { legend: { position: 'bottom' } },
+            onClick: (event, elements) => {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    const jenjang = labels[index];
+                    applyInsightsFilter('jenjang', jenjang);
+                }
+            }
         }
     });
 }
@@ -935,21 +1029,37 @@ function renderBeasiswaChart() {
     const ctx = document.getElementById('beasiswaChart');
     if (!ctx || !insightsData.by_beasiswa) return;
 
-    const labels = Object.keys(insightsData.by_beasiswa).map(b => getTypeLabel(b));
-    const data = Object.values(insightsData.by_beasiswa);
+    // Destroy existing chart
+    if (chartInstances.beasiswa) {
+        chartInstances.beasiswa.destroy();
+    }
 
-    new Chart(ctx, {
+    const rawLabels = Object.keys(insightsData.by_beasiswa);
+    const labels = rawLabels.map(b => getTypeLabel(b));
+    const data = Object.values(insightsData.by_beasiswa);
+    const baseColors = ['#10B981', '#3B82F6', '#F59E0B', '#6B7280'];
+
+    chartInstances.beasiswa = new Chart(ctx, {
         type: 'pie',
         data: {
             labels: labels,
             datasets: [{
                 data: data,
-                backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#6B7280']
+                backgroundColor: baseColors,
+                borderWidth: rawLabels.map(l => insightsFilters.beasiswa === l ? 4 : 1),
+                borderColor: rawLabels.map(l => insightsFilters.beasiswa === l ? '#1F2937' : '#fff')
             }]
         },
         options: {
             responsive: true,
-            plugins: { legend: { position: 'bottom' } }
+            plugins: { legend: { position: 'bottom' } },
+            onClick: (event, elements) => {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    const beasiswa = rawLabels[index];
+                    applyInsightsFilter('beasiswa', beasiswa);
+                }
+            }
         }
     });
 }
@@ -1010,3 +1120,4 @@ window.toggleWishlist = toggleWishlist;
 window.removeFromDraft = removeFromDraft;
 window.saveWishlist = saveWishlist;
 window.loadInsights = loadInsights;
+window.clearInsightsFilter = clearInsightsFilter;
