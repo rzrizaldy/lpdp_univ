@@ -138,7 +138,7 @@ def analyze():
 
     resume_text = data.get('resume_text', '')
     asta_cita = data.get('asta_cita', '')
-    universities = data.get('universities', '[]')
+    universities = data.get('universities', '')
     dream_universities = data.get('dream_universities', [])
 
     if not resume_text or len(resume_text.strip()) < 50:
@@ -165,13 +165,13 @@ Berikan penilaian JUJUR untuk setiap universitas impian di atas."""
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": f"""
 RESUME KANDIDAT:
-{resume_text[:4000]}
+{resume_text[:15000]}
 
 ASPIRASI ASTA CITA:
 {asta_cita or 'Tidak disebutkan'}
 
 DAFTAR UNIVERSITAS (sudah difilter sesuai preferensi kandidat):
-{universities[:2000]}{dream_section}
+{universities[:80000]}{dream_section}
 
 Analisis dan rekomendasikan 5 universitas terbaik dari daftar di atas.
 """}

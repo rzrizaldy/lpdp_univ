@@ -463,6 +463,42 @@ function getFilteredUniversitiesForAnalyzer() {
     return results;
 }
 
+function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+const ANALYZER_SAMPLE_CAP = 500;
+
+// Shuffle first, then dedupe by Perguruan Tinggi — caps the sample by
+// unique-university count, not raw row count, so the AI sees breadth
+// across universities instead of many rows of the same schools' program variants.
+function buildAnalyzerSample(filtered) {
+    const shuffled = shuffleArray(filtered);
+    const seen = new Set();
+    const deduped = [];
+    for (const uni of shuffled) {
+        const key = uni['Perguruan Tinggi'];
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        deduped.push(uni);
+    }
+    return deduped.length > ANALYZER_SAMPLE_CAP ? deduped.slice(0, ANALYZER_SAMPLE_CAP) : deduped;
+}
+
+// Compact plain-text format — only fields relevant to matching a candidate
+// to a program (drops No/Kategori/Bidang/Region/Tipe, which are redundant
+// or irrelevant, to fit far more universities in the same token budget).
+function formatUniversitiesForPrompt(list) {
+    return list.map(u =>
+        `- ${u['Perguruan Tinggi']} | ${u['Program Studi']} | ${u['Lokasi']} | ${u['Jenjang Studi']} | ${u['Beasiswa']}`
+    ).join('\n');
+}
+
 // Resume Analysis
 async function analyzeResume() {
     const astaCita = document.getElementById('astaCita').value.trim();
@@ -481,6 +517,8 @@ async function analyzeResume() {
         alert('Tidak ada universitas yang sesuai dengan filter. Silakan ubah filter.');
         return;
     }
+
+    const analyzerSample = buildAnalyzerSample(filteredForAnalysis);
 
     analyzeBtn.disabled = true;
     analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menganalisis...';
@@ -501,7 +539,7 @@ async function analyzeResume() {
             body: JSON.stringify({
                 resume_text: resumeText,
                 asta_cita: astaCita,
-                universities: JSON.stringify(filteredForAnalysis.slice(0, 50)),
+                universities: formatUniversitiesForPrompt(analyzerSample),
                 dream_universities: myWishlist // Pass saved wishlist
             })
         });
