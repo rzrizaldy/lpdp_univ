@@ -470,27 +470,38 @@ def donations_create():
     if 'localhost' in origin:
         origin = 'https://lpdpfind.allrize.tech'
 
+    notification_url = os.getenv(
+        'DONATION_NOTIFICATION_URL',
+        'https://lpdpfind.allrize.tech/api/donations/notification',
+    )
+
     try:
-        snap = midtrans_lib.create_snap_transaction({
-            'transaction_details': {
-                'order_id': order_id,
-                'gross_amount': amount,
+        snap = midtrans_lib.create_snap_transaction(
+            {
+                'transaction_details': {
+                    'order_id': order_id,
+                    'gross_amount': amount,
+                },
+                'item_details': [{
+                    'id': 'sedekah',
+                    'price': amount,
+                    'quantity': 1,
+                    'name': 'Sedekah LPDP CTRL+F',
+                    'category': 'Donation',
+                    'merchant_name': 'LPDP CTRL+F',
+                }],
+                'customer_details': {
+                    'first_name': 'Supporter',
+                },
+                'callbacks': {
+                    'finish': f'{origin}/?sedekah=success',
+                },
             },
-            'item_details': [{
-                'id': 'sedekah',
-                'price': amount,
-                'quantity': 1,
-                'name': 'Sedekah LPDP CTRL+F',
-                'category': 'Donation',
-                'merchant_name': 'LPDP CTRL+F',
-            }],
-            'customer_details': {
-                'first_name': 'Supporter',
+            extra_headers={
+                # Shared merchant: append lpdpfind webhook alongside Colorize dashboard URL
+                'X-Append-Notification': notification_url,
             },
-            'callbacks': {
-                'finish': f'{origin}/?sedekah=success',
-            },
-        })
+        )
     except ValueError as e:
         return jsonify({'error': str(e)}), 502
 
@@ -534,6 +545,12 @@ def donations_notification():
         payload.get('fraud_status'),
     )
 
+    gross_raw = payload.get('gross_amount', '0')
+    try:
+        gross_amount = int(float(str(gross_raw)))
+    except (TypeError, ValueError):
+        gross_amount = DONATION_MIN_AMOUNT
+
     conn = get_conn()
     if not conn:
         return jsonify({'error': 'Database not configured'}), 503
@@ -542,20 +559,24 @@ def donations_notification():
         with conn, conn.cursor() as cur:
             paid_at = datetime.now(timezone.utc) if local_status == 'paid' else None
             cur.execute(
-                """UPDATE donations SET
-                     status = %s,
-                     payment_type = COALESCE(%s, payment_type),
-                     midtrans_transaction_id = COALESCE(%s, midtrans_transaction_id),
-                     raw_notification = %s,
-                     paid_at = COALESCE(%s, paid_at)
-                   WHERE order_id = %s""",
+                """INSERT INTO donations (
+                     order_id, amount, status, payment_type,
+                     midtrans_transaction_id, raw_notification, paid_at
+                   ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+                   ON CONFLICT (order_id) DO UPDATE SET
+                     status = EXCLUDED.status,
+                     payment_type = COALESCE(EXCLUDED.payment_type, donations.payment_type),
+                     midtrans_transaction_id = COALESCE(EXCLUDED.midtrans_transaction_id, donations.midtrans_transaction_id),
+                     raw_notification = EXCLUDED.raw_notification,
+                     paid_at = COALESCE(EXCLUDED.paid_at, donations.paid_at)""",
                 (
+                    order_id,
+                    gross_amount,
                     local_status,
                     payload.get('payment_type'),
                     payload.get('transaction_id'),
                     Json(payload),
                     paid_at,
-                    order_id,
                 ),
             )
     except Exception as e:

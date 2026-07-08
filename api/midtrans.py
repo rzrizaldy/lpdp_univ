@@ -41,16 +41,19 @@ def _auth_header(server_key: str) -> str:
     return f'Basic {token}'
 
 
-def create_snap_transaction(payload: dict) -> dict:
+def create_snap_transaction(payload: dict, extra_headers: dict | None = None) -> dict:
     server_key = get_server_key()
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': _auth_header(server_key),
+    }
+    if extra_headers:
+        headers.update(extra_headers)
     req = urllib.request.Request(
         f'{_snap_base_url()}/snap/v1/transactions',
         data=json.dumps(payload).encode(),
-        headers={
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': _auth_header(server_key),
-        },
+        headers=headers,
         method='POST',
     )
     try:
