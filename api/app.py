@@ -59,11 +59,13 @@ def _bootstrap_schema():
                     jenjang          text DEFAULT '',
                     beasiswa         text DEFAULT '',
                     created_at       timestamptz DEFAULT now()
-                );
-                CREATE INDEX IF NOT EXISTS idx_wishlists_fingerprint ON wishlists (user_fingerprint);
+                )
             """)
+            cur.execute(
+                "CREATE INDEX IF NOT EXISTS idx_wishlists_fingerprint ON wishlists (user_fingerprint)"
+            )
     except Exception as e:
-        print(f"schema bootstrap failed (will retry on next request): {e}")
+        print(f"schema bootstrap failed (will retry on next request): {e}", flush=True)
 
 
 _bootstrap_schema()
