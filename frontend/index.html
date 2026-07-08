@@ -44,9 +44,9 @@
         <div class="sedekah-banner-inner">
             <p class="sedekah-banner-text">
                 <span class="sedekah-optional">(opsional)</span>
-                Sedekah token untuk mendukung proyek ini
+                donasi token 🤖 untuk dukung fitur analisis asta cita 🎓
             </p>
-            <button type="button" class="sedekah-cta" id="sedekahOpenBtn">Dukung</button>
+            <button type="button" class="sedekah-cta" id="sedekahOpenBtn">Donasi</button>
             <button type="button" class="sedekah-dismiss" id="sedekahDismissBtn" aria-label="Tutup banner">&times;</button>
         </div>
     </div>
@@ -55,18 +55,21 @@
     <div class="sedekah-modal-overlay" id="sedekahModal" hidden aria-hidden="true">
         <div class="sedekah-modal" role="dialog" aria-labelledby="sedekahModalTitle" aria-modal="true">
             <button type="button" class="sedekah-modal-close" id="sedekahModalClose" aria-label="Tutup">&times;</button>
-            <h3 id="sedekahModalTitle">Sedekah token</h3>
-            <p class="sedekah-modal-desc">Dukungan sukarela untuk biaya server &amp; token AI. Minimal Rp5.000.</p>
+            <h3 id="sedekahModalTitle">Donasi token 🤖</h3>
+            <p class="sedekah-modal-desc">Dukungan sukarela untuk biaya server &amp; token AI.</p>
             <div class="sedekah-presets" id="sedekahPresets">
-                <button type="button" class="sedekah-preset active" data-amount="5000">Rp5.000</button>
-                <button type="button" class="sedekah-preset" data-amount="10000">Rp10.000</button>
-                <button type="button" class="sedekah-preset" data-amount="25000">Rp25.000</button>
-                <button type="button" class="sedekah-preset" data-amount="50000">Rp50.000</button>
+                <button type="button" class="sedekah-preset active" data-amount="5000">5rb</button>
+                <button type="button" class="sedekah-preset" data-amount="10000">10rb</button>
+                <button type="button" class="sedekah-preset" data-amount="25000">25rb</button>
+                <button type="button" class="sedekah-preset" data-amount="50000">50rb</button>
             </div>
-            <label class="sedekah-custom-label" for="sedekahCustomAmount">Atau nominal lain (IDR)</label>
-            <input type="text" id="sedekahCustomAmount" class="sedekah-custom-input" inputmode="numeric" placeholder="Contoh: 15.000" autocomplete="off">
+            <label class="sedekah-custom-label" for="sedekahCustomAmount">Nominal lain</label>
+            <input type="text" id="sedekahCustomAmount" class="sedekah-custom-input" inputmode="numeric" placeholder="Min. 5.000" autocomplete="off">
             <p class="sedekah-error" id="sedekahError" hidden></p>
             <button type="button" class="sedekah-submit" id="sedekahSubmitBtn">Lanjutkan</button>
+            <div class="sedekah-modal-alt">
+                <p>atau beli produk edukasi <a href="https://colorize.allrize.tech/" target="_blank" rel="noopener noreferrer">colorize.allrize.tech</a> 🎨</p>
+            </div>
         </div>
     </div>
 

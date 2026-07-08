@@ -151,6 +151,7 @@ body:not(.sedekah-banner-visible) {
     left: 0;
     right: 0;
     z-index: 99;
+    height: var(--sedekah-banner-height);
     background: linear-gradient(90deg, rgba(99, 102, 241, 0.08) 0%, rgba(129, 140, 248, 0.12) 100%);
     border-bottom: 1px solid rgba(99, 102, 241, 0.15);
     backdrop-filter: blur(12px);
@@ -162,31 +163,32 @@ body:not(.sedekah-banner-visible) {
 
 .sedekah-banner-inner {
     max-width: 1100px;
+    height: 100%;
     margin: 0 auto;
-    padding: 8px 24px;
+    padding: 0 24px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
-    min-height: var(--sedekah-banner-height);
+    box-sizing: border-box;
 }
 
 .sedekah-banner-text {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-secondary);
     margin: 0;
-    line-height: 1.4;
+    line-height: 1.35;
 }
 
 .sedekah-optional {
     color: var(--text-muted);
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .sedekah-cta {
     flex-shrink: 0;
-    padding: 5px 14px;
-    font-size: 12px;
+    padding: 3px 10px;
+    font-size: 11px;
     font-weight: 600;
     font-family: inherit;
     color: var(--white);
@@ -194,7 +196,8 @@ body:not(.sedekah-banner-visible) {
     border: none;
     border-radius: 999px;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.15s ease;
+    transition: background 0.2s ease;
+    line-height: 1.3;
 }
 
 .sedekah-cta:hover {
@@ -203,10 +206,10 @@ body:not(.sedekah-banner-visible) {
 
 .sedekah-dismiss {
     flex-shrink: 0;
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
     padding: 0;
-    font-size: 18px;
+    font-size: 16px;
     line-height: 1;
     color: var(--text-muted);
     background: transparent;
@@ -241,8 +244,8 @@ body:not(.sedekah-banner-visible) {
 .sedekah-modal {
     position: relative;
     width: 100%;
-    max-width: 400px;
-    padding: 28px 24px 24px;
+    max-width: 360px;
+    padding: 22px 20px 18px;
     background: var(--white);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
@@ -270,29 +273,29 @@ body:not(.sedekah-banner-visible) {
 }
 
 .sedekah-modal h3 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     color: var(--text-primary);
 }
 
 .sedekah-modal-desc {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-secondary);
-    margin-bottom: 20px;
-    line-height: 1.5;
+    margin-bottom: 14px;
+    line-height: 1.45;
 }
 
 .sedekah-presets {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    margin-bottom: 16px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
 }
 
 .sedekah-preset {
-    padding: 10px 12px;
-    font-size: 14px;
+    padding: 6px 4px;
+    font-size: 12px;
     font-weight: 500;
     font-family: inherit;
     color: var(--text-secondary);
@@ -317,16 +320,16 @@ body:not(.sedekah-banner-visible) {
 
 .sedekah-custom-label {
     display: block;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     color: var(--text-secondary);
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .sedekah-custom-input {
     width: 100%;
-    padding: 10px 12px;
-    font-size: 15px;
+    padding: 8px 10px;
+    font-size: 13px;
     font-family: inherit;
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -348,9 +351,9 @@ body:not(.sedekah-banner-visible) {
 
 .sedekah-submit {
     width: 100%;
-    margin-top: 8px;
-    padding: 12px 16px;
-    font-size: 15px;
+    margin-top: 6px;
+    padding: 9px 12px;
+    font-size: 13px;
     font-weight: 600;
     font-family: inherit;
     color: var(--white);
@@ -368,6 +371,32 @@ body:not(.sedekah-banner-visible) {
 .sedekah-submit:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+.sedekah-modal-alt {
+    margin-top: 14px;
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-align: center;
+}
+
+.sedekah-modal-alt p {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--text-secondary);
+}
+
+.sedekah-modal-alt a {
+    color: var(--accent-dark);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.sedekah-modal-alt a:hover {
+    text-decoration: underline;
 }
 
 .sedekah-toast {
