@@ -17,3 +17,18 @@ CREATE TABLE IF NOT EXISTS wishlists (
 );
 
 CREATE INDEX IF NOT EXISTS idx_wishlists_fingerprint ON wishlists (user_fingerprint);
+
+CREATE TABLE IF NOT EXISTS donations (
+    id                      uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id                text UNIQUE NOT NULL,
+    amount                  int NOT NULL CHECK (amount >= 5000),
+    status                  text NOT NULL DEFAULT 'pending',
+    payment_type            text,
+    midtrans_transaction_id text,
+    raw_notification        jsonb,
+    created_at              timestamptz DEFAULT now(),
+    paid_at                 timestamptz
+);
+
+CREATE INDEX IF NOT EXISTS idx_donations_order_id ON donations (order_id);
+CREATE INDEX IF NOT EXISTS idx_donations_status ON donations (status);

@@ -13,6 +13,8 @@ Data is stored in PostgreSQL (DATABASE_URL). AI stays on OpenAI gpt-4o-mini.
 
 import os
 import json
+import uuid
+from datetime import datetime, timezone
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -20,8 +22,11 @@ from dotenv import load_dotenv
 
 import psycopg
 from psycopg.rows import dict_row
+from psycopg.types.json import Json
 
 from openai import OpenAI
+
+import midtrans as midtrans_lib
 
 load_dotenv()
 
@@ -63,6 +68,25 @@ def _bootstrap_schema():
             """)
             cur.execute(
                 "CREATE INDEX IF NOT EXISTS idx_wishlists_fingerprint ON wishlists (user_fingerprint)"
+            )
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS donations (
+                    id                      uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+                    order_id                text UNIQUE NOT NULL,
+                    amount                  int NOT NULL CHECK (amount >= 5000),
+                    status                  text NOT NULL DEFAULT 'pending',
+                    payment_type            text,
+                    midtrans_transaction_id text,
+                    raw_notification        jsonb,
+                    created_at              timestamptz DEFAULT now(),
+                    paid_at                 timestamptz
+                )
+            """)
+            cur.execute(
+                "CREATE INDEX IF NOT EXISTS idx_donations_order_id ON donations (order_id)"
+            )
+            cur.execute(
+                "CREATE INDEX IF NOT EXISTS idx_donations_status ON donations (status)"
             )
     except Exception as e:
         print(f"schema bootstrap failed (will retry on next request): {e}", flush=True)
@@ -120,7 +144,7 @@ def health():
         'status': 'healthy',
         'openai_configured': client is not None,
         'database_configured': DATABASE_URL is not None,
-        'endpoints': ['/api/analyze', '/api/wishlist', '/api/insights']
+        'endpoints': ['/api/analyze', '/api/wishlist', '/api/insights', '/api/donations/create', '/api/donations/config']
     })
 
 
@@ -400,6 +424,146 @@ def insights():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+# ============ DONATIONS (Midtrans Snap) ============
+DONATION_MIN_AMOUNT = 5000
+DONATION_MAX_AMOUNT = 10_000_000
+
+
+@app.route('/api/donations/config', methods=['GET'])
+def donations_config():
+    client_key = os.getenv('MIDTRANS_CLIENT_KEY')
+    if not client_key:
+        return jsonify({'enabled': False})
+    return jsonify({
+        'enabled': True,
+        'client_key': client_key,
+        'is_production': midtrans_lib._is_production(),
+        'snap_script_url': midtrans_lib.snap_script_url(),
+        'min_amount': DONATION_MIN_AMOUNT,
+    })
+
+
+@app.route('/api/donations/create', methods=['POST'])
+def donations_create():
+    if not os.getenv('MIDTRANS_SERVER_KEY'):
+        return jsonify({'error': 'Pembayaran belum dikonfigurasi'}), 503
+
+    try:
+        data = request.get_json(force=True, silent=True) or {}
+    except Exception:
+        return jsonify({'error': 'Invalid JSON'}), 400
+
+    try:
+        amount = int(data.get('amount', 0))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Nominal tidak valid'}), 400
+
+    if amount < DONATION_MIN_AMOUNT:
+        return jsonify({'error': f'Nominal minimal Rp{DONATION_MIN_AMOUNT:,}'.replace(',', '.')}), 400
+    if amount > DONATION_MAX_AMOUNT:
+        return jsonify({'error': 'Nominal terlalu besar'}), 400
+
+    order_id = f"LPDP-SDKH-{int(datetime.now(timezone.utc).timestamp())}-{uuid.uuid4().hex[:8]}"
+    origin = request.headers.get('Origin') or request.host_url.rstrip('/')
+    if 'localhost' in origin:
+        origin = 'https://lpdpfind.allrize.tech'
+
+    try:
+        snap = midtrans_lib.create_snap_transaction({
+            'transaction_details': {
+                'order_id': order_id,
+                'gross_amount': amount,
+            },
+            'item_details': [{
+                'id': 'sedekah',
+                'price': amount,
+                'quantity': 1,
+                'name': 'Sedekah LPDP CTRL+F',
+                'category': 'Donation',
+                'merchant_name': 'LPDP CTRL+F',
+            }],
+            'customer_details': {
+                'first_name': 'Supporter',
+            },
+            'callbacks': {
+                'finish': f'{origin}/?sedekah=success',
+            },
+        })
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 502
+
+    conn = get_conn()
+    if conn:
+        try:
+            with conn, conn.cursor() as cur:
+                cur.execute(
+                    """INSERT INTO donations (order_id, amount, status)
+                       VALUES (%s, %s, 'pending')""",
+                    (order_id, amount),
+                )
+        except Exception as e:
+            print(f'donation insert failed: {e}', flush=True)
+        finally:
+            conn.close()
+
+    return jsonify({
+        'token': snap['token'],
+        'order_id': order_id,
+        'amount': amount,
+    })
+
+
+@app.route('/api/donations/notification', methods=['POST'])
+def donations_notification():
+    try:
+        payload = request.get_json(force=True, silent=True) or {}
+    except Exception:
+        return jsonify({'error': 'Invalid JSON'}), 400
+
+    if not midtrans_lib.verify_signature(payload):
+        return jsonify({'error': 'Invalid signature'}), 401
+
+    order_id = payload.get('order_id')
+    if not order_id:
+        return jsonify({'error': 'Missing order_id'}), 400
+
+    local_status = midtrans_lib.to_local_status(
+        payload.get('transaction_status'),
+        payload.get('fraud_status'),
+    )
+
+    conn = get_conn()
+    if not conn:
+        return jsonify({'error': 'Database not configured'}), 503
+
+    try:
+        with conn, conn.cursor() as cur:
+            paid_at = datetime.now(timezone.utc) if local_status == 'paid' else None
+            cur.execute(
+                """UPDATE donations SET
+                     status = %s,
+                     payment_type = COALESCE(%s, payment_type),
+                     midtrans_transaction_id = COALESCE(%s, midtrans_transaction_id),
+                     raw_notification = %s,
+                     paid_at = COALESCE(%s, paid_at)
+                   WHERE order_id = %s""",
+                (
+                    local_status,
+                    payload.get('payment_type'),
+                    payload.get('transaction_id'),
+                    Json(payload),
+                    paid_at,
+                    order_id,
+                ),
+            )
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+    return jsonify({'ok': True})
 
 
 # ============ HELPERS ============

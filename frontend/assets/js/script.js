@@ -3,10 +3,15 @@
  * Full Bahasa Indonesia
  */
 
-// Use relative URL for production, localhost for development
-const API_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:8001/api' 
+// Use relative URL for production, localhost Flask API for development
+const API_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:8080/api'
     : '/api';
+
+const SEDEKAH_MIN_AMOUNT = 5000;
+const SEDEKAH_PRESETS = [5000, 10000, 25000, 50000];
+let sedekahSelectedAmount = 5000;
+let snapScriptLoaded = false;
 
 // State
 let allUniversities = [];
@@ -29,6 +34,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupNavbarScroll();
     loadInsights();
     loadDownloadsConfig();
+    setupSedekah();
+    handleSedekahReturn();
 });
 
 // Load downloads last update
@@ -1149,6 +1156,215 @@ function renderWordCloud() {
 
         return `<span class="word-cloud-item" style="font-size: ${size}px; color: ${color}; opacity: ${opacity};" title="${keyword.count} kali">${keyword.word}</span>`;
     }).join('');
+}
+
+// ============ SEDEKAH / DONATIONS ============
+function setupSedekah() {
+    const banner = document.getElementById('sedekahBanner');
+    const openBtn = document.getElementById('sedekahOpenBtn');
+    const dismissBtn = document.getElementById('sedekahDismissBtn');
+    const modal = document.getElementById('sedekahModal');
+    const modalClose = document.getElementById('sedekahModalClose');
+    const presets = document.getElementById('sedekahPresets');
+    const customInput = document.getElementById('sedekahCustomAmount');
+    const submitBtn = document.getElementById('sedekahSubmitBtn');
+
+    if (!banner) return;
+
+    if (sessionStorage.getItem('sedekah_banner_dismissed') === '1') {
+        banner.hidden = true;
+        document.body.classList.remove('sedekah-banner-visible');
+    } else {
+        banner.hidden = false;
+        document.body.classList.add('sedekah-banner-visible');
+    }
+
+    openBtn?.addEventListener('click', openSedekahModal);
+    dismissBtn?.addEventListener('click', () => {
+        banner.hidden = true;
+        document.body.classList.remove('sedekah-banner-visible');
+        sessionStorage.setItem('sedekah_banner_dismissed', '1');
+    });
+    modalClose?.addEventListener('click', closeSedekahModal);
+    modal?.addEventListener('click', (e) => {
+        if (e.target === modal) closeSedekahModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal && !modal.hidden) closeSedekahModal();
+    });
+
+    presets?.querySelectorAll('.sedekah-preset').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            presets.querySelectorAll('.sedekah-preset').forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+            sedekahSelectedAmount = parseInt(btn.dataset.amount, 10);
+            if (customInput) customInput.value = '';
+            hideSedekahError();
+        });
+    });
+
+    customInput?.addEventListener('input', () => {
+        presets?.querySelectorAll('.sedekah-preset').forEach((b) => b.classList.remove('active'));
+        hideSedekahError();
+    });
+
+    submitBtn?.addEventListener('click', submitSedekah);
+}
+
+function openSedekahModal() {
+    const modal = document.getElementById('sedekahModal');
+    if (!modal) return;
+    sedekahSelectedAmount = 5000;
+    const presets = document.getElementById('sedekahPresets');
+    const customInput = document.getElementById('sedekahCustomAmount');
+    presets?.querySelectorAll('.sedekah-preset').forEach((b) => {
+        b.classList.toggle('active', b.dataset.amount === '5000');
+    });
+    if (customInput) customInput.value = '';
+    hideSedekahError();
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeSedekahModal() {
+    const modal = document.getElementById('sedekahModal');
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute('aria-hidden', 'true');
+    hideSedekahError();
+}
+
+function parseIdrAmount(raw) {
+    if (!raw || !String(raw).trim()) return null;
+    const digits = String(raw).replace(/[^\d]/g, '');
+    if (!digits) return null;
+    return parseInt(digits, 10);
+}
+
+function getSedekahAmount() {
+    const customInput = document.getElementById('sedekahCustomAmount');
+    const custom = customInput ? parseIdrAmount(customInput.value) : null;
+    if (custom) return custom;
+    return sedekahSelectedAmount;
+}
+
+function showSedekahError(msg) {
+    const el = document.getElementById('sedekahError');
+    if (!el) return;
+    el.textContent = msg;
+    el.hidden = false;
+}
+
+function hideSedekahError() {
+    const el = document.getElementById('sedekahError');
+    if (!el) return;
+    el.hidden = true;
+    el.textContent = '';
+}
+
+function showSedekahToast(msg, type = '') {
+    const existing = document.querySelector('.sedekah-toast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.className = `sedekah-toast${type ? ` ${type}` : ''}`;
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 4500);
+}
+
+function formatIdr(n) {
+    return `Rp${n.toLocaleString('id-ID')}`;
+}
+
+async function loadSnapScript(clientKey, scriptUrl) {
+    if (window.snap && snapScriptLoaded) return;
+    const url = scriptUrl || 'https://app.midtrans.com/snap/snap.js';
+    await new Promise((resolve, reject) => {
+        const existing = document.querySelector('script[data-midtrans-snap]');
+        if (existing) {
+            existing.addEventListener('load', resolve);
+            existing.addEventListener('error', reject);
+            if (window.snap) resolve();
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = url;
+        script.setAttribute('data-client-key', clientKey);
+        script.setAttribute('data-midtrans-snap', '1');
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+    snapScriptLoaded = true;
+}
+
+async function submitSedekah() {
+    const amount = getSedekahAmount();
+    if (!amount || amount < SEDEKAH_MIN_AMOUNT) {
+        showSedekahError(`Nominal minimal ${formatIdr(SEDEKAH_MIN_AMOUNT)}`);
+        return;
+    }
+    hideSedekahError();
+
+    const submitBtn = document.getElementById('sedekahSubmitBtn');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Memproses...';
+    }
+
+    try {
+        const configRes = await fetch(`${API_URL}/donations/config`);
+        const config = await configRes.json();
+        if (!config.enabled) {
+            throw new Error('Pembayaran belum tersedia. Coba lagi nanti.');
+        }
+
+        await loadSnapScript(config.client_key, config.snap_script_url);
+
+        const createRes = await fetch(`${API_URL}/donations/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount }),
+        });
+        const payload = await createRes.json();
+        if (!createRes.ok) {
+            throw new Error(payload.error || 'Gagal membuat transaksi');
+        }
+
+        closeSedekahModal();
+
+        window.snap.pay(payload.token, {
+            onSuccess: () => {
+                showSedekahToast('Terima kasih atas dukunganmu!', 'success');
+            },
+            onPending: () => {
+                showSedekahToast('Pembayaran menunggu konfirmasi.');
+            },
+            onError: () => {
+                showSedekahToast('Pembayaran dibatalkan atau gagal.');
+            },
+            onClose: () => {},
+        });
+    } catch (err) {
+        console.error('Sedekah error:', err);
+        showSedekahError(err.message || 'Terjadi kesalahan. Silakan coba lagi.');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Lanjutkan';
+        }
+    }
+}
+
+function handleSedekahReturn() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('sedekah') === 'success') {
+        showSedekahToast('Terima kasih atas dukunganmu!', 'success');
+        params.delete('sedekah');
+        const qs = params.toString();
+        const next = `${window.location.pathname}${qs ? `?${qs}` : ''}${window.location.hash}`;
+        window.history.replaceState({}, '', next);
+    }
 }
 
 // Expose to global

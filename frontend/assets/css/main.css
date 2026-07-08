@@ -131,9 +131,296 @@ body {
 }
 .nav-links a:hover { color: var(--text-primary); }
 
+/* === Sedekah banner === */
+:root {
+    --nav-height: 51px;
+    --sedekah-banner-height: 40px;
+}
+
+body.sedekah-banner-visible {
+    --content-offset: calc(var(--nav-height) + var(--sedekah-banner-height));
+}
+
+body:not(.sedekah-banner-visible) {
+    --content-offset: var(--nav-height);
+}
+
+.sedekah-banner {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    z-index: 99;
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.08) 0%, rgba(129, 140, 248, 0.12) 100%);
+    border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+    backdrop-filter: blur(12px);
+}
+
+.sedekah-banner[hidden] {
+    display: none !important;
+}
+
+.sedekah-banner-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 8px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: var(--sedekah-banner-height);
+}
+
+.sedekah-banner-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.sedekah-optional {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.sedekah-cta {
+    flex-shrink: 0;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--white);
+    background: var(--accent);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.sedekah-cta:hover {
+    background: var(--accent-dark);
+}
+
+.sedekah-dismiss {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    font-size: 18px;
+    line-height: 1;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.sedekah-dismiss:hover {
+    color: var(--text-secondary);
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* Sedekah modal */
+.sedekah-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+}
+
+.sedekah-modal-overlay[hidden] {
+    display: none !important;
+}
+
+.sedekah-modal {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    padding: 28px 24px 24px;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    animation: fadeIn 0.25s ease;
+}
+
+.sedekah-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.sedekah-modal-close:hover {
+    color: var(--text-primary);
+    background: var(--bg);
+}
+
+.sedekah-modal h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+}
+
+.sedekah-modal-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.sedekah-presets {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.sedekah-preset {
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--text-secondary);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sedekah-preset:hover {
+    border-color: var(--accent-light);
+    color: var(--accent-dark);
+}
+
+.sedekah-preset.active {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: var(--accent);
+    color: var(--accent-dark);
+    font-weight: 600;
+}
+
+.sedekah-custom-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.sedekah-custom-input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    transition: border-color 0.2s ease;
+}
+
+.sedekah-custom-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.sedekah-error {
+    font-size: 12px;
+    color: var(--error);
+    margin-bottom: 8px;
+}
+
+.sedekah-submit {
+    width: 100%;
+    margin-top: 8px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--white);
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.sedekah-submit:hover:not(:disabled) {
+    background: var(--accent-dark);
+}
+
+.sedekah-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.sedekah-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 300;
+    padding: 12px 20px;
+    font-size: 14px;
+    color: var(--white);
+    background: var(--bg-dark);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    animation: fadeIn 0.3s ease;
+}
+
+.sedekah-toast.success {
+    background: var(--success);
+}
+
+@media (max-width: 640px) {
+    .sedekah-banner-inner {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 8px 16px;
+        gap: 8px;
+    }
+
+    .sedekah-banner-text {
+        flex: 1 1 100%;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .sedekah-cta {
+        margin: 0 auto;
+    }
+
+    .sedekah-dismiss {
+        position: absolute;
+        right: 8px;
+        top: 4px;
+    }
+
+    .sedekah-banner-inner {
+        position: relative;
+    }
+}
+
 /* === Hero Section with Space Background === */
 .hero {
-    padding: 140px 0 80px;
+    padding: calc(var(--content-offset, 51px) + 89px) 0 80px;
     text-align: center;
     background: linear-gradient(180deg, #0a0a0f 0%, #151520 100%);
     position: relative;
