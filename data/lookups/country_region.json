@@ -1,0 +1,178 @@
+{
+  "Amerika Serikat": {
+    "lokasi": "Amerika Serikat",
+    "region": "Amerika"
+  },
+  "Inggris": {
+    "lokasi": "Inggris",
+    "region": "Eropa"
+  },
+  "Jerman": {
+    "lokasi": "Jerman",
+    "region": "Eropa"
+  },
+  "Jepang": {
+    "lokasi": "Jepang",
+    "region": "Asia"
+  },
+  "Tiongkok": {
+    "lokasi": "Tiongkok",
+    "region": "Asia"
+  },
+  "Prancis": {
+    "lokasi": "Prancis",
+    "region": "Eropa"
+  },
+  "Denmark": {
+    "lokasi": "Denmark",
+    "region": "Eropa"
+  },
+  "Finlandia": {
+    "lokasi": "Finlandia",
+    "region": "Eropa"
+  },
+  "Australia": {
+    "lokasi": "Australia",
+    "region": "Oseania"
+  },
+  "Italia": {
+    "lokasi": "Italia",
+    "region": "Eropa"
+  },
+  "Selandia Baru": {
+    "lokasi": "Selandia Baru",
+    "region": "Oseania"
+  },
+  "Hong Kong": {
+    "lokasi": "Hong Kong",
+    "region": "Asia"
+  },
+  "Belanda": {
+    "lokasi": "Belanda",
+    "region": "Eropa"
+  },
+  "Swiss": {
+    "lokasi": "Swiss",
+    "region": "Eropa"
+  },
+  "Belgia": {
+    "lokasi": "Belgia",
+    "region": "Eropa"
+  },
+  "Korea Selatan": {
+    "lokasi": "Korea Selatan",
+    "region": "Asia"
+  },
+  "Austria": {
+    "lokasi": "Austria",
+    "region": "Eropa"
+  },
+  "Arab Saudi": {
+    "lokasi": "Arab Saudi",
+    "region": "Asia"
+  },
+  "Swedia": {
+    "lokasi": "Swedia",
+    "region": "Eropa"
+  },
+  "Rusia": {
+    "lokasi": "Rusia",
+    "region": "Eropa"
+  },
+  "Kanada": {
+    "lokasi": "Kanada",
+    "region": "Amerika"
+  },
+  "Singapura": {
+    "lokasi": "Singapura",
+    "region": "Asia"
+  },
+  "Taiwan": {
+    "lokasi": "Taiwan",
+    "region": "Asia"
+  },
+  "Norwegia": {
+    "lokasi": "Norwegia",
+    "region": "Eropa"
+  },
+  "Islandia": {
+    "lokasi": "Islandia",
+    "region": "Eropa"
+  },
+  "Irlandia": {
+    "lokasi": "Irlandia",
+    "region": "Eropa"
+  },
+  "Spanyol": {
+    "lokasi": "Spanyol",
+    "region": "Eropa"
+  },
+  "Luksemburg": {
+    "lokasi": "Luksemburg",
+    "region": "Eropa"
+  },
+  "Skotlandia": {
+    "lokasi": "Skotlandia",
+    "region": "Eropa"
+  },
+  "Uni Emirat Arab": {
+    "lokasi": "Uni Emirat Arab",
+    "region": "Asia"
+  },
+  "Turki": {
+    "lokasi": "Turki",
+    "region": "Asia"
+  },
+  "Malaysia": {
+    "lokasi": "Malaysia",
+    "region": "Asia"
+  },
+  "Iran": {
+    "lokasi": "Iran",
+    "region": "Asia"
+  },
+  "India": {
+    "lokasi": "India",
+    "region": "Asia"
+  },
+  "Afrika Selatan": {
+    "lokasi": "Afrika Selatan",
+    "region": "Afrika"
+  },
+  "Portugal": {
+    "lokasi": "Portugal",
+    "region": "Eropa"
+  },
+  "Polandia": {
+    "lokasi": "Polandia",
+    "region": "Eropa"
+  },
+  "Thailand": {
+    "lokasi": "Thailand",
+    "region": "Asia"
+  },
+  "Meksiko": {
+    "lokasi": "Meksiko",
+    "region": "Amerika"
+  },
+  "Prancis / Singapura": {
+    "lokasi": "Prancis / Singapura",
+    "region": "Asia"
+  },
+  "Republik Ceko": {
+    "lokasi": "Republik Ceko",
+    "region": "Eropa"
+  },
+  "Chili": {
+    "lokasi": "Chili",
+    "region": "Amerika"
+  },
+  "Hungaria": {
+    "lokasi": "Hungaria",
+    "region": "Eropa"
+  },
+  "Oman": {
+    "lokasi": "Oman",
+    "region": "Asia"
+  }
+}

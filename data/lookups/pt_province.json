@@ -1,0 +1,342 @@
+{
+  "Institut Pertanian Bogor": {
+    "lokasi": "Jawa Barat",
+    "region": "Jawa"
+  },
+  "Institut Teknologi Bandung": {
+    "lokasi": "Jawa Barat",
+    "region": "Jawa"
+  },
+  "Institut Teknologi Sepuluh Nopember": {
+    "lokasi": "Jawa Timur",
+    "region": "Jawa"
+  },
+  "King's College London, Indonesia": {
+    "lokasi": "DKI Jakarta",
+    "region": "Jawa"
+  },
+  "Monash University, Indonesia": {
+    "lokasi": "Banten",
+    "region": "Jawa"
+  },
+  "Universitas Bina Nusantara": {
+    "lokasi": "DKI Jakarta",
+    "region": "Jawa"
+  },
+  "Universitas Brawijaya": {
+    "lokasi": "Jawa Timur",
+    "region": "Jawa"
+  },
+  "Universitas Diponegoro": {
+    "lokasi": "Jawa Tengah",
+    "region": "Jawa"
+  },
+  "Universitas Gadjah Mada": {
+    "lokasi": "DI Yogyakarta",
+    "region": "Jawa"
+  },
+  "Universitas Hasanuddin": {
+    "lokasi": "Sulawesi Selatan",
+    "region": "Sulawesi"
+  },
+  "Universitas Indonesia": {
+    "lokasi": "Jawa Barat",
+    "region": "Jawa"
+  },
+  "Universitas Padjadjaran": {
+    "lokasi": "Jawa Barat",
+    "region": "Jawa"
+  },
+  "Universitas Telkom": {
+    "lokasi": "Jawa Barat",
+    "region": "Jawa"
+  },
+  "Western Sydney University, Indonesia": {
+    "lokasi": "Banten",
+    "region": "Jawa"
+  },
+  "Universitas Sumatera Utara": {
+    "lokasi": "Sumatera Utara",
+    "region": "Sumatera"
+  },
+  "Universitas Airlangga": {
+    "lokasi": "Jawa Timur",
+    "region": "Jawa"
+  },
+  "Universitas Sebelas Maret": {
+    "lokasi": "Jawa Tengah",
+    "region": "Jawa"
+  },
+  "Institu Teknologi Sepuluh Nopember": {
+    "lokasi": "Jawa Timur",
+    "region": "Jawa"
+  },
+  "Universitas Andalas": {
+    "lokasi": "Sumatera Barat",
+    "region": "Sumatera"
+  },
+  "Universitas Gunadarma": {
+    "lokasi": "Jawa Barat",
+    "region": "Jawa"
+  },
+  "Universitas Islam Indonesia": {
+    "lokasi": "DI Yogyakarta",
+    "region": "Jawa"
+  },
+  "Universitas Kristen Satya Wacana": {
+    "lokasi": "Jawa Tengah",
+    "region": "Jawa"
+  },
+  "Universitas Negeri Makassar": {
+    "lokasi": "Sulawesi Selatan",
+    "region": "Sulawesi"
+  },
+  "Universitas Negeri Malang": {
+    "lokasi": "Jawa Timur",
+    "region": "Jawa"
+  },
+  "Universitas Riau": {
+    "lokasi": "Riau",
+    "region": "Sumatera"
+  },
+  "Universitas Islam Sultan Agung": {
+    "lokasi": "Jawa Tengah",
+    "region": "Jawa"
+  },
+  "Universitas Syiah Kuala": {
+    "lokasi": "Aceh",
+    "region": "Sumatera"
+  },
+  "Universitas Bengkulu": {
+    "lokasi": "Bengkulu",
+    "region": "Sumatera"
+  },
+  "Universitas Cenderawasih": {
+    "lokasi": "Papua",
+    "region": "Papua"
+  },
+  "Universitas Halu Oleo": {
+    "lokasi": "Sulawesi Tenggara",
+    "region": "Sulawesi"
+  },
+  "Universitas Islam Negeri Maulana Malik Ibrahim": {
+    "lokasi": "Jawa Timur",
+    "region": "Jawa"
+  },
+  "Universitas Jenderal Soedirman": {
+    "lokasi": "Jawa Tengah",
+    "region": "Jawa"
+  },
+  "Universitas Lampung": {
+    "lokasi": "Lampung",
+    "region": "Sumatera"
+  },
+  "Universitas Muhammadiyah Jakarta": {
+    "lokasi": "DKI Jakarta",
+    "region": "Jawa"
+  },
+  "Universitas Muhammadiyah Surakarta": {
+    "lokasi": "Jawa Tengah",
+    "region": "Jawa"
+  },
+  "Universitas Muslim Indonesia": {
+    "lokasi": "Sulawesi Selatan",
+    "region": "Sulawesi"
+  },
+  "Universitas Nasional": {
+    "lokasi": "DKI Jakarta",
+    "region": "Jawa"
+  },
+  "Universitas Negeri Padang": {
+    "lokasi": "Sumatera Barat",
+    "region": "Sumatera"
+  },
+  "Universitas Pendidikan Indonesia": {
+    "lokasi": "Jawa Barat",
+    "region": "Jawa"
+  },
+  "Universitas Sriwijaya": {
+    "lokasi": "Sumatera Selatan",
+    "region": "Sumatera"
+  },
+  "Universitas Tanjungpura": {
+    "lokasi": "Kalimantan Barat",
+    "region": "Kalimantan"
+  },
+  "Universitas Udayana": {
+    "lokasi": "Bali",
+    "region": "Bali"
+  },
+  "Universitas Islam Negeri Alauddin": {
+    "lokasi": "Sulawesi Selatan",
+    "region": "Sulawesi"
+  },
+  "Universitas Muhammadiyah Yogyakarta": {
+    "lokasi": "DI Yogyakarta",
+    "region": "Jawa"
+  },
+  "Universitas Negeri Gorontalo": {
+    "lokasi": "Gorontalo",
+    "region": "Sulawesi"
+  },
+  "Universitas Negeri Semarang": {
+    "lokasi": "Jawa Tengah",
+    "region": "Jawa"
+  },
+  "Universitas Nusa Cendana": {
+    "lokasi": "Nusa Tenggara Timur",
+    "region": "Nusa Tenggara"
+  },
+  "Universitas Sam Ratulangi": {
+    "lokasi": "Sulawesi Utara",
+    "region": "Sulawesi"
+  },
+  "Universitas Jambi": {
+    "lokasi": "Jambi",
+    "region": "Sumatera"
+  },
+  "Universitas Medan Area": {
+    "lokasi": "Sumatera Utara",
+    "region": "Sumatera"
+  },
+  "Universitas Muhammadiyah Malang": {
+    "lokasi": "Jawa Timur",
+    "region": "Jawa"
+  },
+  "Universitas Prima Indonesia": {
+    "lokasi": "Sumatera Utara",
+    "region": "Sumatera"
+  },
+  "Universitas 17 Agustus 1945 Surabaya": {
+    "lokasi": "Jawa Timur",
+    "region": "Jawa"
+  },
+  "Universitas Islam Internasional Indonesia": {
+    "lokasi": "Jawa Barat",
+    "region": "Jawa"
+  },
+  "Universitas Islam Negeri Ar- Raniry Banda Aceh": {
+    "lokasi": "Aceh",
+    "region": "Sumatera"
+  },
+  "Universitas Islam Negeri Imam Bonjol Padang": {
+    "lokasi": "Sumatera Barat",
+    "region": "Sumatera"
+  },
+  "Universitas Islam Negeri Raden Fatah Palembang": {
+    "lokasi": "Sumatera Selatan",
+    "region": "Sumatera"
+  },
+  "Universitas Islam Negeri Sumatera Utara Medan": {
+    "lokasi": "Sumatera Utara",
+    "region": "Sumatera"
+  },
+  "Universitas Islam Negeri Sunan Ampel": {
+    "lokasi": "Jawa Timur",
+    "region": "Jawa"
+  },
+  "Universitas Islam Negeri Sunan Kalijaga": {
+    "lokasi": "DI Yogyakarta",
+    "region": "Jawa"
+  },
+  "Universitas Islam Negeri Syarif Hidayatullah": {
+    "lokasi": "Banten",
+    "region": "Jawa"
+  },
+  "Universitas Katolik Indonesia Atma Jaya": {
+    "lokasi": "DKI Jakarta",
+    "region": "Jawa"
+  },
+  "Universitas Muhammadiyah Sumatera Utara": {
+    "lokasi": "Sumatera Utara",
+    "region": "Sumatera"
+  },
+  "Universitas Negeri Jakarta": {
+    "lokasi": "DKI Jakarta",
+    "region": "Jawa"
+  },
+  "Universitas Negeri Surabaya": {
+    "lokasi": "Jawa Timur",
+    "region": "Jawa"
+  },
+  "Universitas Pelita Harapan": {
+    "lokasi": "Banten",
+    "region": "Jawa"
+  },
+  "Universitas Pendidikan Ganesha": {
+    "lokasi": "Bali",
+    "region": "Bali"
+  },
+  "Universitas Borobudur": {
+    "lokasi": "DKI Jakarta",
+    "region": "Jawa"
+  },
+  "Universitas Islam Malang": {
+    "lokasi": "Jawa Timur",
+    "region": "Jawa"
+  },
+  "Universitas Islam Negeri Kiai Haji Achmad Siddiq Jember": {
+    "lokasi": "Jawa Timur",
+    "region": "Jawa"
+  },
+  "Universitas Islam Negeri Sayyid Ali Rahmatullah Tulungagung": {
+    "lokasi": "Jawa Timur",
+    "region": "Jawa"
+  },
+  "Universitas Pakuan": {
+    "lokasi": "Jawa Barat",
+    "region": "Jawa"
+  },
+  "Institut Seni Indonesia Denpasar": {
+    "lokasi": "Bali",
+    "region": "Bali"
+  },
+  "Institut Seni Indonesia Surakarta": {
+    "lokasi": "Jawa Tengah",
+    "region": "Jawa"
+  },
+  "Institut Seni Indonesia Yogyakarta": {
+    "lokasi": "DI Yogyakarta",
+    "region": "Jawa"
+  },
+  "Universitas Islam Negeri Ar-Raniry Banda Aceh": {
+    "lokasi": "Aceh",
+    "region": "Sumatera"
+  },
+  "Universitas Islam Negeri Mataram": {
+    "lokasi": "Nusa Tenggara Barat",
+    "region": "Nusa Tenggara"
+  },
+  "Universitas Islam Negeri Sulthan Thaha Saifuddin Jambi": {
+    "lokasi": "Jambi",
+    "region": "Sumatera"
+  },
+  "Universitas Islam Negeri Antasari Banjarmasin": {
+    "lokasi": "Kalimantan Selatan",
+    "region": "Kalimantan"
+  },
+  "Universitas Islam Negeri Sultan Syarif Kasim Riau": {
+    "lokasi": "Riau",
+    "region": "Sumatera"
+  },
+  "Universitas Islam Negeri Sunan Gunung Djati": {
+    "lokasi": "Jawa Barat",
+    "region": "Jawa"
+  },
+  "Universitas Negeri Medan": {
+    "lokasi": "Sumatera Utara",
+    "region": "Sumatera"
+  },
+  "Universitas Negeri Yogyakarta": {
+    "lokasi": "DI Yogyakarta",
+    "region": "Jawa"
+  },
+  "Sekolah Tinggi Filsafat Driyarkara": {
+    "lokasi": "DKI Jakarta",
+    "region": "Jawa"
+  },
+  "Universitas Kristen Duta Wacana": {
+    "lokasi": "DI Yogyakarta",
+    "region": "Jawa"
+  }
+}

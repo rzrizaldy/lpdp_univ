@@ -711,6 +711,16 @@ body {
     border-color: #0D9488;
 }
 
+.filter-tab.filter-kategori.active {
+    background: #7C3AED;
+    color: var(--white);
+    border-color: #7C3AED;
+}
+
+.filter-tab.filter-kategori:hover {
+    border-color: #7C3AED;
+}
+
 .filter-tab.filter-jenjang:hover {
     border-color: #0D9488;
     color: #0D9488;
@@ -766,6 +776,12 @@ body {
     background: #0D9488;
     color: var(--white);
     border-color: #0D9488;
+}
+
+.filter-tab.filter-kategori-analyzer.active {
+    background: #7C3AED;
+    color: var(--white);
+    border-color: #7C3AED;
 }
 
 .filter-tab.filter-jenjang-analyzer:hover {

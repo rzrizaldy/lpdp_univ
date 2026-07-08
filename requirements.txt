@@ -10,6 +10,9 @@ tiktoken>=0.5.0
 # Data Processing
 pandas>=2.0.0
 openpyxl>=3.1.0
+pdfplumber>=0.11.0
+
+# ETL (see data/requirements-etl.txt)
 
 # API Server
 flask>=3.0.0

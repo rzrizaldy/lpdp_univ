@@ -127,6 +127,15 @@ function setupEventListeners() {
         });
     });
 
+    // Filter tabs - Kategori
+    document.querySelectorAll('.filter-tab.filter-kategori').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.filter-tab.filter-kategori').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            performSearch();
+        });
+    });
+
     // Filter dropdown - Lokasi
     const lokasiFilter = document.getElementById('lokasiFilter');
     if (lokasiFilter) {
@@ -145,6 +154,14 @@ function setupEventListeners() {
     document.querySelectorAll('.filter-tab.filter-jenjang-analyzer').forEach(tab => {
         tab.addEventListener('click', () => {
             document.querySelectorAll('.filter-tab.filter-jenjang-analyzer').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+        });
+    });
+
+    // Analyzer filters - Kategori
+    document.querySelectorAll('.filter-tab.filter-kategori-analyzer').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.filter-tab.filter-kategori-analyzer').forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
         });
     });
@@ -197,6 +214,10 @@ function performSearch() {
     const activeJenjangTab = document.querySelector('.filter-tab.filter-jenjang.active');
     const filterJenjang = activeJenjangTab ? activeJenjangTab.dataset.jenjang : 'all';
 
+    // Get Kategori filter
+    const activeKategoriTab = document.querySelector('.filter-tab.filter-kategori.active');
+    const filterKategori = activeKategoriTab ? activeKategoriTab.dataset.kategori : 'all';
+
     // Get Lokasi filter
     const lokasiSelect = document.getElementById('lokasiFilter');
     const filterLokasi = lokasiSelect ? lokasiSelect.value : 'all';
@@ -227,6 +248,11 @@ function performSearch() {
             }
             return true;
         });
+    }
+
+    // Kategori filter (Afirmasi track)
+    if (filterKategori && filterKategori !== 'all') {
+        results = results.filter(uni => (uni.Kategori || '').toLowerCase() === filterKategori.toLowerCase());
     }
 
     // Lokasi filter
@@ -438,6 +464,10 @@ function getFilteredUniversitiesForAnalyzer() {
     const activeJenjangTab = document.querySelector('.filter-tab.filter-jenjang-analyzer.active');
     const filterJenjang = activeJenjangTab ? activeJenjangTab.dataset.jenjang : 'all';
 
+    // Get Kategori filter
+    const activeKategoriTab = document.querySelector('.filter-tab.filter-kategori-analyzer.active');
+    const filterKategori = activeKategoriTab ? activeKategoriTab.dataset.kategori : 'all';
+
     // Get Lokasi filter
     const lokasiSelect = document.getElementById('lokasiFilterAnalyzer');
     const filterLokasi = lokasiSelect ? lokasiSelect.value : 'all';
@@ -460,6 +490,11 @@ function getFilteredUniversitiesForAnalyzer() {
             }
             return true;
         });
+    }
+
+    // Kategori filter (Afirmasi track)
+    if (filterKategori && filterKategori !== 'all') {
+        results = results.filter(uni => (uni.Kategori || '').toLowerCase() === filterKategori.toLowerCase());
     }
 
     // Lokasi filter

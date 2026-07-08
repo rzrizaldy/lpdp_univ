@@ -1,0 +1,188 @@
+{
+  "passed": true,
+  "errors": [],
+  "error_count": 0,
+  "stats": {
+    "total": 29662,
+    "kategori": {
+      "unggulan": 1264,
+      "luar negeri": 25663,
+      "dalam negeri": 815,
+      "afirmasi": 1920
+    },
+    "beasiswa": {
+      "": 16,
+      "STEM Bidang STEM": 17548,
+      "STEM Bidang Pendukung STEM": 4880,
+      "SHARE": 7218
+    },
+    "tipe": {
+      "Luar Negeri": 26927,
+      "Dalam Negeri": 2735
+    }
+  },
+  "garble_dropped_count": 246,
+  "diff_vs_baseline": {
+    "old_total": 28007,
+    "new_total": 29662,
+    "delta": 1655,
+    "old_kategori": {
+      "unggulan": 1703,
+      "dalam negeri": 785,
+      "luar negeri": 24083,
+      "afirmasi": 1436
+    },
+    "new_kategori": {
+      "unggulan": 1264,
+      "luar negeri": 25663,
+      "dalam negeri": 815,
+      "afirmasi": 1920
+    },
+    "added_count": 7606,
+    "removed_count": 6230,
+    "added_sample": [
+      [
+        "luar negeri",
+        "EPFL (Ecole Polytechnique Fédérale de Lausanne)",
+        "Digital Humanities",
+        "Swiss",
+        "STEM Bidang STEM"
+      ],
+      [
+        "luar negeri",
+        "Universitat Autònoma de Barcelona",
+        "Discourse Studies: Communication, Society and Learning",
+        "Spanyol",
+        "SHARE"
+      ],
+      [
+        "luar negeri",
+        "University of California, Los Angeles (UCLA)",
+        "Environmental Science and Engineering , D.Env.",
+        "Amerika Serikat",
+        "STEM Bidang STEM"
+      ],
+      [
+        "unggulan",
+        "Columbia University",
+        "Master of Science in Advanced Architectural Design (M.S.AAD)",
+        "Amerika Serikat",
+        "STEM Bidang STEM"
+      ],
+      [
+        "luar negeri",
+        "University of Glasgow",
+        "Epidemiology of Infectious Diseases & Antimicrobial Resistance [MSc]",
+        "Inggris",
+        "STEM Bidang STEM"
+      ],
+      [
+        "afirmasi",
+        "Universitas Indonesia",
+        "Herbal",
+        "Jawa Barat",
+        "STEM Bidang STEM"
+      ],
+      [
+        "luar negeri",
+        "Rheinische Friedrich-Wilhelms-Universität Bonn",
+        "Computer Science - MSc",
+        "Jerman",
+        "STEM Bidang STEM"
+      ],
+      [
+        "unggulan",
+        "Yale University",
+        "Electrical & Computer Engineering",
+        "Amerika Serikat",
+        "STEM Bidang STEM"
+      ],
+      [
+        "luar negeri",
+        "Zhejiang University",
+        "Computer Science and Technology - M.Eng",
+        "Tiongkok",
+        "STEM Bidang STEM"
+      ],
+      [
+        "unggulan",
+        "University of Michigan-Ann Arbor",
+        "Earth and Environmental Sciences, PhD",
+        "Amerika Serikat",
+        "STEM Bidang STEM"
+      ]
+    ],
+    "removed_sample": [
+      [
+        "luar negeri",
+        "University of Science and Technology of China",
+        "Information and Communication Engineering Ã¢â‚¬â€_x009d_ Ph.D",
+        "Tiongkok",
+        "STEM Bidang STEM"
+      ],
+      [
+        "luar negeri",
+        "Tongji University",
+        "Intelligence Science and Technique Ã¢â‚¬â€_x009d_ Ph.D",
+        "Tiongkok",
+        "STEM Bidang STEM"
+      ],
+      [
+        "luar negeri",
+        "Renmin University of China",
+        "(MAE)",
+        "Tiongkok",
+        "STEM Bidang Pendukung STEM"
+      ],
+      [
+        "unggulan",
+        "Imperial College London",
+        "Mathematics (Research) Ã¢â‚¬â€_x009d_ MRes",
+        "Inggris",
+        "STEM Bidang STEM"
+      ],
+      [
+        "unggulan",
+        "Princeton University",
+        "Chemical and Biological Engineering, Ph.D. Chemistry, Ph,D.",
+        "Amerika Serikat",
+        "STEM Bidang STEM"
+      ],
+      [
+        "luar negeri",
+        "Kyushu University",
+        "International MasterÃ¢â‚¬â„¢s Course in Sustainable Architecture and Urban Systems",
+        "Jepang",
+        "SHARE"
+      ],
+      [
+        "luar negeri",
+        "University of Montpellier",
+        "Master Ã¢â‚¬Å“Earth and Planetary Sciences, EnvironmentÃ¢â‚¬_x009d_",
+        "Prancis",
+        "STEM Bidang STEM"
+      ],
+      [
+        "unggulan",
+        "Imperial College London",
+        "MSc Risk Management & Financial Engineering,",
+        "Inggris",
+        "STEM Bidang Pendukung STEM"
+      ],
+      [
+        "luar negeri",
+        "Rheinische Friedrich-Wilhelms- UniversitÃƒÂ¤t Bonn",
+        "Astrophysics, Ph.D",
+        "Jerman",
+        "STEM Bidang STEM"
+      ],
+      [
+        "unggulan",
+        "Tsinghua University",
+        "M.S.- Cyberspace Security",
+        "Tiongkok",
+        "STEM Bidang STEM"
+      ]
+    ]
+  }
+}
