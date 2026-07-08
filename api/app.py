@@ -158,7 +158,7 @@ Berikan penilaian JUJUR untuk setiap universitas impian di atas."""
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-5.4-mini",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": f"""
@@ -174,8 +174,8 @@ DAFTAR UNIVERSITAS (sudah difilter sesuai preferensi kandidat):
 Analisis dan rekomendasikan 5 universitas terbaik dari daftar di atas.
 """}
             ],
-            temperature=0.5,
-            max_tokens=1800
+            reasoning_effort="low",
+            max_completion_tokens=3000
         )
 
         result_text = response.choices[0].message.content

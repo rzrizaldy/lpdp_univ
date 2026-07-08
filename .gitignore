@@ -30,3 +30,4 @@ nohup.out
 # Database
 *.db
 chroma_db/
+databackup/
