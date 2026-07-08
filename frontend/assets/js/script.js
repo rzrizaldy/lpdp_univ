@@ -1160,31 +1160,16 @@ function renderWordCloud() {
 
 // ============ SEDEKAH / DONATIONS ============
 function setupSedekah() {
-    const banner = document.getElementById('sedekahBanner');
     const openBtn = document.getElementById('sedekahOpenBtn');
-    const dismissBtn = document.getElementById('sedekahDismissBtn');
     const modal = document.getElementById('sedekahModal');
     const modalClose = document.getElementById('sedekahModalClose');
     const presets = document.getElementById('sedekahPresets');
     const customInput = document.getElementById('sedekahCustomAmount');
     const submitBtn = document.getElementById('sedekahSubmitBtn');
 
-    if (!banner) return;
+    if (!openBtn || !modal) return;
 
-    if (sessionStorage.getItem('sedekah_banner_dismissed') === '1') {
-        banner.hidden = true;
-        document.body.classList.remove('sedekah-banner-visible');
-    } else {
-        banner.hidden = false;
-        document.body.classList.add('sedekah-banner-visible');
-    }
-
-    openBtn?.addEventListener('click', openSedekahModal);
-    dismissBtn?.addEventListener('click', () => {
-        banner.hidden = true;
-        document.body.classList.remove('sedekah-banner-visible');
-        sessionStorage.setItem('sedekah_banner_dismissed', '1');
-    });
+    openBtn.addEventListener('click', openSedekahModal);
     modalClose?.addEventListener('click', closeSedekahModal);
     modal?.addEventListener('click', (e) => {
         if (e.target === modal) closeSedekahModal();
