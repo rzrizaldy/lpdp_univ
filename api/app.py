@@ -43,6 +43,32 @@ def get_conn():
     return psycopg.connect(DATABASE_URL, row_factory=dict_row)
 
 
+def _bootstrap_schema():
+    """Idempotent schema creation, run once at process startup."""
+    if not DATABASE_URL:
+        return
+    try:
+        with psycopg.connect(DATABASE_URL, autocommit=True) as conn, conn.cursor() as cur:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS wishlists (
+                    id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+                    user_fingerprint text NOT NULL,
+                    university_name  text NOT NULL DEFAULT '',
+                    program_name     text NOT NULL DEFAULT '',
+                    location         text DEFAULT '',
+                    jenjang          text DEFAULT '',
+                    beasiswa         text DEFAULT '',
+                    created_at       timestamptz DEFAULT now()
+                );
+                CREATE INDEX IF NOT EXISTS idx_wishlists_fingerprint ON wishlists (user_fingerprint);
+            """)
+    except Exception as e:
+        print(f"schema bootstrap failed (will retry on next request): {e}")
+
+
+_bootstrap_schema()
+
+
 SYSTEM_PROMPT = """Kamu adalah konsultan senior beasiswa LPDP yang KRITIS dan JUJUR. Tugasmu menilai kandidat secara objektif - jangan terlalu mudah memberi skor tinggi.
 
 STANDAR PENILAIAN (KETAT):
