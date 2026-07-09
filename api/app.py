@@ -15,6 +15,7 @@ import os
 import json
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -39,6 +40,34 @@ if os.getenv('OPENAI_API_KEY'):
     client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 DATABASE_URL = os.getenv('DATABASE_URL')
+
+# Provinces used to split wishlist location stats (DN vs LN)
+def _load_dn_provinces() -> set[str]:
+    """Load Indonesian province names from PT lookup + common provinces."""
+    provinces = {
+        'DKI Jakarta', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'DI Yogyakarta',
+        'Banten', 'Bali', 'Sumatera Utara', 'Sumatera Barat', 'Sumatera Selatan',
+        'Riau', 'Lampung', 'Kalimantan Selatan', 'Kalimantan Timur', 'Sulawesi Selatan',
+        'Sulawesi Utara', 'Papua', 'Maluku', 'Nusa Tenggara Timur', 'Bangka Belitung',
+    }
+    lookup_path = Path(__file__).resolve().parent.parent / 'data' / 'lookups' / 'pt_province.json'
+    if lookup_path.exists():
+        try:
+            with open(lookup_path, encoding='utf-8') as f:
+                for entry in json.load(f).values():
+                    loc = (entry.get('lokasi') or '').strip()
+                    if loc:
+                        provinces.add(loc)
+        except (json.JSONDecodeError, OSError):
+            pass
+    return provinces
+
+
+_DN_PROVINCES = _load_dn_provinces()
+
+
+def _is_dn_location(location: str) -> bool:
+    return (location or '').strip() in _DN_PROVINCES
 
 
 def get_conn():
@@ -367,12 +396,17 @@ def insights():
         total_wishlists = len(wishlists)
         unique_users = len(set(w['user_fingerprint'] for w in wishlists))
 
-        # Top locations
-        location_counts = {}
+        # Top locations — split LN (country) vs DN (province)
+        ln_counts: dict[str, int] = {}
+        dn_counts: dict[str, int] = {}
         for w in wishlists:
-            loc = w.get('location', '') or 'Unknown'
-            location_counts[loc] = location_counts.get(loc, 0) + 1
-        top_locations = sorted(location_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+            loc = (w.get('location') or '').strip() or 'Unknown'
+            if _is_dn_location(loc):
+                dn_counts[loc] = dn_counts.get(loc, 0) + 1
+            else:
+                ln_counts[loc] = ln_counts.get(loc, 0) + 1
+        top_locations_ln = sorted(ln_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+        top_locations_dn = sorted(dn_counts.items(), key=lambda x: x[1], reverse=True)[:10]
 
         # Top universities
         uni_counts = {}
@@ -421,7 +455,8 @@ def insights():
         return jsonify({
             'total_wishlists': total_wishlists,
             'total_users': unique_users,
-            'top_locations': [{'name': loc, 'count': cnt} for loc, cnt in top_locations],
+            'top_locations_ln': [{'name': loc, 'count': cnt} for loc, cnt in top_locations_ln],
+            'top_locations_dn': [{'name': loc, 'count': cnt} for loc, cnt in top_locations_dn],
             'top_universities': [{'name': uni, 'count': cnt} for uni, cnt in top_universities],
             'by_jenjang': jenjang_counts,
             'by_beasiswa': beasiswa_counts,

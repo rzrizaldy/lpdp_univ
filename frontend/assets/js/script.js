@@ -979,7 +979,7 @@ function updateWishlistUI() {
 
 let insightsData = null;
 let insightsFilters = { location: null, jenjang: null, beasiswa: null, university: null };
-let chartInstances = { location: null, jenjang: null, beasiswa: null };
+let chartInstances = { locationLn: null, locationDn: null, jenjang: null, beasiswa: null };
 
 async function loadInsights(filters = {}) {
     try {
@@ -1016,7 +1016,8 @@ function renderInsights() {
 
     // Render charts if Chart.js is loaded
     if (window.Chart) {
-        renderLocationChart();
+        renderLocationLnChart();
+        renderLocationDnChart();
         renderJenjangChart();
         renderBeasiswaChart();
     }
@@ -1062,26 +1063,25 @@ function applyInsightsFilter(type, value) {
     loadInsights(insightsFilters);
 }
 
-function renderLocationChart() {
-    const ctx = document.getElementById('locationChart');
-    if (!ctx || !insightsData.top_locations) return;
+function renderLocationBarChart(canvasId, instanceKey, locations, baseColor, activeColor) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx || !locations || locations.length === 0) return;
 
-    // Destroy existing chart
-    if (chartInstances.location) {
-        chartInstances.location.destroy();
+    if (chartInstances[instanceKey]) {
+        chartInstances[instanceKey].destroy();
     }
 
-    const locations = insightsData.top_locations.slice(0, 8);
+    const top = locations.slice(0, 8);
 
-    chartInstances.location = new Chart(ctx, {
+    chartInstances[instanceKey] = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: locations.map(l => l.name),
+            labels: top.map(l => l.name),
             datasets: [{
                 label: 'Jumlah',
-                data: locations.map(l => l.count),
-                backgroundColor: locations.map(l =>
-                    insightsFilters.location === l.name ? '#4F46E5' : '#6366F1'
+                data: top.map(l => l.count),
+                backgroundColor: top.map(l =>
+                    insightsFilters.location === l.name ? activeColor : baseColor
                 ),
                 borderRadius: 4
             }]
@@ -1094,12 +1094,31 @@ function renderLocationChart() {
             onClick: (event, elements) => {
                 if (elements.length > 0) {
                     const index = elements[0].index;
-                    const location = locations[index].name;
-                    applyInsightsFilter('location', location);
+                    applyInsightsFilter('location', top[index].name);
                 }
             }
         }
     });
+}
+
+function renderLocationLnChart() {
+    renderLocationBarChart(
+        'locationLnChart',
+        'locationLn',
+        insightsData.top_locations_ln,
+        '#6366F1',
+        '#4F46E5'
+    );
+}
+
+function renderLocationDnChart() {
+    renderLocationBarChart(
+        'locationDnChart',
+        'locationDn',
+        insightsData.top_locations_dn,
+        '#0D9488',
+        '#0F766E'
+    );
 }
 
 function renderJenjangChart() {
