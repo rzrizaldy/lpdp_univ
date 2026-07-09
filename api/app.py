@@ -14,6 +14,7 @@ Data is stored in PostgreSQL (DATABASE_URL). AI stays on OpenAI gpt-4o-mini.
 import os
 import json
 import uuid
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -64,6 +65,17 @@ def _load_dn_provinces() -> set[str]:
 
 
 _DN_PROVINCES = _load_dn_provinces()
+
+_GARBLED_TEXT_RE = re.compile(
+    r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]|ãâ|x009d',
+    re.IGNORECASE,
+)
+
+
+def _is_garbled_text(text: str) -> bool:
+    if not text:
+        return False
+    return bool(_GARBLED_TEXT_RE.search(text))
 
 
 def _is_dn_location(location: str) -> bool:
@@ -121,7 +133,29 @@ def _bootstrap_schema():
         print(f"schema bootstrap failed (will retry on next request): {e}", flush=True)
 
 
+def _cleanup_garbled_wishlists():
+    """Remove wishlist rows with corrupted program/university names."""
+    if not DATABASE_URL:
+        return
+    try:
+        with psycopg.connect(DATABASE_URL, autocommit=True) as conn, conn.cursor() as cur:
+            cur.execute("""
+                DELETE FROM wishlists
+                WHERE program_name ~ '[\\x00-\\x08\\x0b\\x0c\\x0e-\\x1f\\x7f-\\x9f]'
+                   OR university_name ~ '[\\x00-\\x08\\x0b\\x0c\\x0e-\\x1f\\x7f-\\x9f]'
+                   OR program_name ILIKE '%x009d%'
+                   OR university_name ILIKE '%x009d%'
+                   OR program_name LIKE '%ãâ%'
+                   OR university_name LIKE '%ãâ%'
+            """)
+            if cur.rowcount:
+                print(f"Removed {cur.rowcount} garbled wishlist row(s)", flush=True)
+    except Exception as e:
+        print(f"garbled wishlist cleanup failed: {e}", flush=True)
+
+
 _bootstrap_schema()
+_cleanup_garbled_wishlists()
 
 
 SYSTEM_PROMPT = """Kamu adalah konsultan senior beasiswa LPDP yang KRITIS dan JUJUR. Tugasmu menilai kandidat secara objektif - jangan terlalu mudah memberi skor tinggi.
@@ -380,7 +414,11 @@ def insights():
     try:
         with get_conn() as conn, conn.cursor() as cur:
             cur.execute("SELECT * FROM wishlists")
-            wishlists = cur.fetchall()
+            wishlists = [
+                w for w in cur.fetchall()
+                if not _is_garbled_text(w.get('program_name', ''))
+                and not _is_garbled_text(w.get('university_name', ''))
+            ]
 
         # Apply filters
         if filter_location:
@@ -408,12 +446,28 @@ def insights():
         top_locations_ln = sorted(ln_counts.items(), key=lambda x: x[1], reverse=True)[:10]
         top_locations_dn = sorted(dn_counts.items(), key=lambda x: x[1], reverse=True)[:10]
 
+        # When filtering by location, blank the opposite chart (LN vs DN)
+        if filter_location:
+            if _is_dn_location(filter_location):
+                top_locations_ln = []
+            else:
+                top_locations_dn = []
+
         # Top universities
         uni_counts = {}
         for w in wishlists:
             uni = w.get('university_name', 'Unknown')
             uni_counts[uni] = uni_counts.get(uni, 0) + 1
         top_universities = sorted(uni_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+
+        # Top programs (full program studi names)
+        program_counts = {}
+        for w in wishlists:
+            prog = (w.get('program_name') or '').strip()
+            if not prog or _is_garbled_text(prog):
+                continue
+            program_counts[prog] = program_counts.get(prog, 0) + 1
+        top_programs = sorted(program_counts.items(), key=lambda x: x[1], reverse=True)[:10]
 
         # By jenjang
         jenjang_counts = {}
@@ -444,10 +498,12 @@ def insights():
         word_counts = {}
         for w in wishlists:
             program = w.get('program_name', '') or ''
+            if _is_garbled_text(program):
+                continue
             words = program.lower().replace('-', ' ').replace('/', ' ').replace('(', ' ').replace(')', ' ').split()
             for word in words:
                 word = ''.join(c for c in word if c.isalnum())
-                if word and len(word) > 2 and word not in stop_words:
+                if word and len(word) > 2 and word not in stop_words and not _is_garbled_text(word):
                     word_counts[word] = word_counts.get(word, 0) + 1
 
         top_keywords = sorted(word_counts.items(), key=lambda x: x[1], reverse=True)[:30]
@@ -458,6 +514,7 @@ def insights():
             'top_locations_ln': [{'name': loc, 'count': cnt} for loc, cnt in top_locations_ln],
             'top_locations_dn': [{'name': loc, 'count': cnt} for loc, cnt in top_locations_dn],
             'top_universities': [{'name': uni, 'count': cnt} for uni, cnt in top_universities],
+            'top_programs': [{'name': prog, 'count': cnt} for prog, cnt in top_programs],
             'by_jenjang': jenjang_counts,
             'by_beasiswa': beasiswa_counts,
             'program_keywords': [{'word': w, 'count': c} for w, c in top_keywords],

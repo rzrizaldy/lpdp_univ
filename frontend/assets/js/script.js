@@ -1022,8 +1022,9 @@ function renderInsights() {
         renderBeasiswaChart();
     }
 
-    // Render top universities list
+    // Render top universities & programs
     renderTopUniversities();
+    renderTopPrograms();
 
     // Render word cloud
     renderWordCloud();
@@ -1063,13 +1064,25 @@ function applyInsightsFilter(type, value) {
     loadInsights(insightsFilters);
 }
 
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function renderLocationBarChart(canvasId, instanceKey, locations, baseColor, activeColor) {
     const ctx = document.getElementById(canvasId);
-    if (!ctx || !locations || locations.length === 0) return;
+    if (!ctx) return;
 
     if (chartInstances[instanceKey]) {
         chartInstances[instanceKey].destroy();
+        chartInstances[instanceKey] = null;
     }
+
+    if (!locations || locations.length === 0) return;
 
     const top = locations.slice(0, 8);
 
@@ -1211,8 +1224,28 @@ function renderTopUniversities() {
         <div class="ranking-item ${insightsFilters.university === u.name ? 'ranking-item-active' : ''}" onclick="applyInsightsFilter('university', '${u.name.replace(/'/g, "\\'")}')">
             <span class="ranking-number">${i + 1}</span>
             <div class="ranking-info">
-                <span class="ranking-name">${u.name}</span>
+                <span class="ranking-name">${escapeHtml(u.name)}</span>
                 <span class="ranking-count">${u.count} impian</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderTopPrograms() {
+    const container = document.getElementById('topPrograms');
+    if (!container || !insightsData.top_programs) return;
+
+    if (insightsData.top_programs.length === 0) {
+        container.innerHTML = '<p class="no-data">Belum ada data</p>';
+        return;
+    }
+
+    container.innerHTML = insightsData.top_programs.slice(0, 5).map((p, i) => `
+        <div class="ranking-item">
+            <span class="ranking-number">${i + 1}</span>
+            <div class="ranking-info">
+                <span class="ranking-name ranking-name-program" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</span>
+                <span class="ranking-count">${p.count} impian</span>
             </div>
         </div>
     `).join('');
@@ -1222,20 +1255,22 @@ function renderWordCloud() {
     const container = document.getElementById('programWordCloud');
     if (!container || !insightsData.program_keywords) return;
 
-    if (insightsData.program_keywords.length === 0) {
+    const keywords = insightsData.program_keywords.filter(
+        keyword => keyword.word && !/ãâ|x009d/i.test(keyword.word)
+    );
+
+    if (keywords.length === 0) {
         container.innerHTML = '<p class="no-data">Belum ada data</p>';
         return;
     }
 
-    // Get max count for scaling
-    const maxCount = Math.max(...insightsData.program_keywords.map(k => k.count));
+    const maxCount = Math.max(...keywords.map(k => k.count));
     const minSize = 12;
     const maxSize = 36;
 
-    // Color palette
     const colors = ['#6366F1', '#0D9488', '#F59E0B', '#EC4899', '#10B981', '#3B82F6', '#8B5CF6', '#EF4444'];
 
-    container.innerHTML = insightsData.program_keywords.map((keyword, i) => {
+    container.innerHTML = keywords.map((keyword, i) => {
         // Scale font size based on count
         const size = minSize + ((keyword.count / maxCount) * (maxSize - minSize));
         const color = colors[i % colors.length];
