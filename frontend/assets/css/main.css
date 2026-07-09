@@ -811,17 +811,41 @@ body {
     color: var(--text-secondary);
 }
 
+.table-scroll-hint {
+    display: none;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+    }
+    .table-scroll-hint { display: inline-flex; align-items: center; gap: 6px; }
+}
+
 /* === Table === */
 .table-wrapper {
     background: var(--white);
     border-radius: var(--radius);
     border: 1px solid var(--border);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 .data-table {
     width: 100%;
     border-collapse: collapse;
+}
+
+@media (max-width: 768px) {
+    .data-table { min-width: 860px; }
+    .data-table th,
+    .data-table td { white-space: nowrap; }
 }
 
 .data-table th {
@@ -1011,6 +1035,34 @@ body {
 }
 
 .analyzer-card textarea::placeholder { color: var(--text-muted); }
+
+.field-keywords-label { margin-top: 14px; margin-bottom: 6px; }
+
+.field-keywords-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+    background: var(--white);
+    color: var(--text-primary);
+}
+
+.field-keywords-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.field-keywords-input::placeholder { color: var(--text-muted); }
+
+.field-keywords-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
 
 /* Upload Zone */
 .upload-zone {

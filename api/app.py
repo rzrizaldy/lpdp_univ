@@ -164,9 +164,20 @@ def analyze():
     asta_cita = data.get('asta_cita', '')
     universities = data.get('universities', '')
     dream_universities = data.get('dream_universities', [])
+    field_keywords = data.get('field_keywords', [])
 
     if not resume_text or len(resume_text.strip()) < 50:
         return jsonify({'error': 'Resume/CV terlalu pendek atau kosong'}), 400
+
+    # Build target field keywords section
+    keywords_section = ""
+    if field_keywords and isinstance(field_keywords, list) and len(field_keywords) > 0:
+        keywords_section = f"""
+
+BIDANG/JURUSAN YANG DISASAR KANDIDAT:
+{', '.join(str(k) for k in field_keywords[:5])}
+
+Prioritaskan rekomendasi yang relevan dengan bidang-bidang ini."""
 
     # Build dream universities section
     dream_section = ""
@@ -192,7 +203,7 @@ RESUME KANDIDAT:
 {resume_text[:15000]}
 
 ASPIRASI ASTA CITA:
-{asta_cita or 'Tidak disebutkan'}
+{asta_cita or 'Tidak disebutkan'}{keywords_section}
 
 DAFTAR UNIVERSITAS (sudah difilter sesuai preferensi kandidat):
 {universities[:80000]}{dream_section}

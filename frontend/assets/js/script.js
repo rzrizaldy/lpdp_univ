@@ -455,6 +455,33 @@ function loadPdfJs() {
 }
 
 // Get filtered universities for analyzer
+// Parse "design, finance, analytics" into a deduped list capped at 5 keywords
+function parseFieldKeywords(raw) {
+    if (!raw) return [];
+    const seen = new Set();
+    const keywords = [];
+    for (const part of raw.split(',')) {
+        const kw = part.trim().toLowerCase();
+        if (!kw || seen.has(kw)) continue;
+        seen.add(kw);
+        keywords.push(kw);
+        if (keywords.length >= 5) break;
+    }
+    return keywords;
+}
+
+// Narrow a university list to rows whose Program Studi matches any keyword.
+// Falls back to the unfiltered list when nothing matches, so a niche keyword
+// doesn't zero out the candidate pool the AI gets to recommend from.
+function filterUniversitiesByKeywords(universities, keywords) {
+    if (!keywords || keywords.length === 0) return universities;
+    const matched = universities.filter(uni => {
+        const program = (uni['Program Studi'] || '').toLowerCase();
+        return keywords.some(kw => program.includes(kw));
+    });
+    return matched.length > 0 ? matched : universities;
+}
+
 function getFilteredUniversitiesForAnalyzer() {
     // Get Jenis filter
     const activeJenisTab = document.querySelector('.filter-tab.filter-jenis-analyzer.active');
@@ -544,6 +571,7 @@ function formatUniversitiesForPrompt(list) {
 // Resume Analysis
 async function analyzeResume() {
     const astaCita = document.getElementById('astaCita').value.trim();
+    const fieldKeywords = parseFieldKeywords(document.getElementById('fieldKeywords').value.trim());
     const resultDiv = document.getElementById('analysisResult');
     const analyzeBtn = document.getElementById('analyzeBtn');
 
@@ -552,8 +580,12 @@ async function analyzeResume() {
         return;
     }
 
-    // Get filtered universities based on analyzer filters
-    const filteredForAnalysis = getFilteredUniversitiesForAnalyzer();
+    // Get filtered universities based on analyzer filters, then narrow further
+    // by target field keywords (e.g. "design, finance") when the user gave any
+    const filteredForAnalysis = filterUniversitiesByKeywords(
+        getFilteredUniversitiesForAnalyzer(),
+        fieldKeywords
+    );
 
     if (filteredForAnalysis.length === 0) {
         alert('Tidak ada universitas yang sesuai dengan filter. Silakan ubah filter.');
@@ -581,6 +613,7 @@ async function analyzeResume() {
             body: JSON.stringify({
                 resume_text: resumeText,
                 asta_cita: astaCita,
+                field_keywords: fieldKeywords,
                 universities: formatUniversitiesForPrompt(analyzerSample),
                 dream_universities: myWishlist // Pass saved wishlist
             })
